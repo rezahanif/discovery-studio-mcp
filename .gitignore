@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+!.env.example
+
+# Reports (generated)
+reports/environment-report.json
+
+# Workspace (job outputs)
+workspace/
+!workspace/.gitkeep
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff
+.ruff_cache/
