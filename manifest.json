@@ -1,0 +1,25 @@
+{
+  "id": "discovery-studio-mcp",
+  "name": "BIOVIA Discovery Studio Connector",
+  "version": "1.0.0",
+  "description": "BIOVIA Discovery Studio molecular modeling via MCP: structure inspection, validation, conversion, protocol execution, job management, rendering tools through a stdio proxy (MIT, adapted for AiConnect)",
+  "publisher": "adapted by AiConnect",
+  "manifest_schema_version": 1,
+  "package_format_version": 1,
+  "min_app_version": "0.4.0",
+  "platform": {
+    "os": "windows",
+    "arch": ["x64"]
+  },
+  "runtime": "python",
+  "entry": "run_server.py",
+  "entry_args": [],
+  "stdio": true,
+  "token_env_var": "MCP_LICENSE_TOKEN",
+  "entitlement_tier": "pro",
+  "platform_requirements": {
+    "python": ["Python >= 3.11"],
+    "host": ["BIOVIA Discovery Studio 2020 (Windows desktop software)"],
+    "optional": ["Pipeline Pilot Server (for protocol execution)"]
+  }
+}

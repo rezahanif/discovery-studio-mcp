@@ -1,235 +1,112 @@
-# Discovery Studio MCP Server
+# Discovery Studio MCP — AiConnect Connector (BIOVIA Discovery Studio)
 
-MCP (Model Context Protocol) server for programmatic automation of BIOVIA Discovery Studio.
-Enables AI agents to safely control Discovery Studio operations without constant computer use.
-
-## Supported Versions
-
-- Discovery Studio 2020 (20.1) - **tested**
-- Other DS versions (2019, 2021+) - likely compatible with path adjustments
-
-## Requirements
-
-- Python 3.11+
-- BIOVIA Discovery Studio 2020 (or compatible version)
-- Optional: Pipeline Pilot Server (for protocol execution)
-- Optional: DS Client license (for licensed protocols)
-
-## Installation
-
-```powershell
-cd discovery-studio-mcp
-pip install -e .
-```
-
-## Configuration
-
-Copy `.env.example` to `.env` and adjust:
-
-```env
-# Required
-DS_HOME=C:\Program Files\BIOVIA\Discovery Studio 2020
-DS_PERL_EXECUTABLE=C:\Program Files\BIOVIA\Discovery Studio 2020\bin\perl.exe
-
-# Optional (for protocol execution)
-DS_PIPELINE_PILOT_URL=localhost:9943
-DS_PIPELINE_PILOT_USERNAME=your_username
-DS_PIPELINE_PILOT_PASSWORD=your_password
-
-# Security
-DS_ALLOWED_INPUT_DIRS=C:\Users\%USERNAME%\Documents
-DS_OUTPUT_DIR=./workspace
-DS_MAX_FILE_SIZE_MB=500
-DS_JOB_TIMEOUT_SECONDS=3600
-
-# Development
-DS_MOCK_MODE=true   # Set to false for real Discovery Studio
-```
-
-### Finding Your Discovery Studio Installation
-
-The server auto-detects Discovery Studio at `C:\Program Files\BIOVIA\Discovery Studio 2020`.
-To find your installation:
-
-1. Run: `tools/discover_environment.py`
-2. Check the generated `reports/environment-report.md`
-3. Update `.env` with the detected paths
-
-### Pipeline Pilot Setup
-
-Protocol execution requires a Pipeline Pilot Server. If you don't have one:
-
-1. Set `DS_MOCK_MODE=true` for development
-2. Structure inspection and file operations still work
-3. Contact your BIOVIA administrator for Pipeline Pilot access
-
-## Running the MCP Server (stdio)
-
-```powershell
-python -m discovery_studio_mcp.server
-```
-
-The server communicates via stdin/stdout using the MCP JSON-RPC protocol.
-
-## MCP Client Configuration
-
-### Claude Desktop
-
-```json
-{
-  "mcpServers": {
-    "discovery-studio": {
-      "command": "python",
-      "args": ["-m", "discovery_studio_mcp.server"],
-      "cwd": "C:\\Users\\yourname\\discovery-studio-mcp",
-      "env": {
-        "DS_MOCK_MODE": "true",
-        "PYTHONPATH": "src"
-      }
-    }
-  }
-}
-```
-
-### OpenCode / Codex
-
-```json
-{
-  "mcpServers": {
-    "discovery-studio": {
-      "command": "python",
-      "args": ["-m", "discovery_studio_mcp.server"],
-      "cwd": "/path/to/discovery-studio-mcp",
-      "env": {
-        "DS_MOCK_MODE": "true",
-        "PYTHONPATH": "src"
-      }
-    }
-  }
-}
-```
-
-## Available Tools
-
-### Diagnostics
-
-| Tool | Description |
-|------|-------------|
-| `ds_get_capabilities` | Get DS version, adapters, formats, license status |
-| `ds_health_check` | Safety check of all components |
-
-### Structures
-
-| Tool | Description |
-|------|-------------|
-| `ds_inspect_structure` | Inspect file: chains, residues, atoms, ligands, waters, metals |
-| `ds_validate_structure` | Check structure suitability for a workflow |
-| `ds_convert_structure` | Convert between supported formats |
-
-### Protocols
-
-| Tool | Description |
-|------|-------------|
-| `ds_list_protocols` | List available protocols |
-| `ds_describe_protocol` | Get protocol parameters, defaults, requirements |
-| `ds_run_protocol` | Execute a protocol (requires Pipeline Pilot) |
-
-### Jobs
-
-| Tool | Description |
-|------|-------------|
-| `ds_get_job_status` | Poll job progress and results |
-| `ds_cancel_job` | Cancel a running job |
-| `ds_list_jobs` | List recent jobs |
-
-### Visualization
-
-| Tool | Description |
-|------|-------------|
-| `ds_render_structure` | Render structure to image (requires GUI) |
-
-## Working Directory Structure
+Adaptation of [`discovery-studio-mcp`](https://github.com/rezahanif/discovery-studio-mcp)
+(MIT, v0.1.0) into an AiConnect connector.
+Integration family: **HOST_PLUGIN**.
 
 ```
-workspace/
-  jobs/
-    <job_id>/
-      input/          # Input files (copied)
-      output/         # Output files
-      logs/           # Job logs
-      manifest.json   # Full reproducibility record
+AiConnect Process Manager
+    │  stdio
+    ▼
+run_server.py  (this package, spawned by the PM)
+    │  license gate + envelope wrap (monkey-patches call_tool handler)
+    ▼
+discovery_studio_mcp.server  (upstream Python MCP server, mcp SDK)
+    │  stdio transport
+    ▼
+discovery_studio_mcp.adapters  (DiscoveryScript / Filesystem / Mock)
+    │  Perl scripts + DS API / file parsing
+    ▼
+BIOVIA Discovery Studio 2020 (Windows desktop)
 ```
 
-## Mock Mode
+This is NOT a remote/cloud execution model. Discovery Studio **runs locally**
+on the user's Windows machine; the connector provides MCP tool access to its
+molecular modeling capabilities.
 
-Set `DS_MOCK_MODE=true` for development without Discovery Studio. All responses
-are marked `"mock": true`. The mock adapter returns synthetic data for testing.
+## ⚠️ Host prerequisite (read first)
 
-## Security
+**The Process Manager does not install or provide BIOVIA Discovery Studio.**
 
-See [SECURITY.md](SECURITY.md) for the full security model.
+- The user must already have a supported **Discovery Studio 2020 (20.1)**
+  installation on a Windows machine.
+- The server auto-detects DS at `C:\Program Files\BIOVIA\Discovery Studio 2020`.
+  Set `DS_HOME` in `.env` if installed elsewhere.
+- Optional: **Pipeline Pilot Server** for protocol execution. Without it,
+  structure inspection and file operations still work (or use mock mode).
+- The connector communicates only with the local DS installation. If
+  Discovery Studio is not installed, the server starts in mock mode and
+  tool calls return synthetic data.
 
-Key points:
-- No arbitrary code execution
-- Path traversal protection
-- Whitelist-based extension validation
-- Output isolation in workspace directory
-- Protocol whitelist
-- Destructive action confirmation
+## Authentication — two independent layers
 
-## Limitations
+| Layer | Authority | Question it answers |
+|---|---|---|
+| AiConnect license (`MCP_LICENSE_TOKEN`, HS256, minted per spawn) | AiConnect gateway | "May this agent use discovery-studio-mcp?" |
+| Discovery Studio license | Dassault Systèmes (vendor) | "May this machine run Discovery Studio?" |
 
-1. **Protocol execution requires Pipeline Pilot Server** - not available locally
-2. **Rendering requires GUI session** - no headless rendering API
-3. **Discovery Script runs inside DS Client** - CLI mode is limited
-4. **License-dependent features** - some protocols require specific licenses
-5. **Windows path handling** - Unix-style paths may need conversion
+Different authorities. The AiConnect token governs **only** AiConnect
+entitlement; it must not replace, proxy, or bypass the Discovery Studio
+vendor licensing mechanism. The connector's license gate is enforced at
+the MCP handler boundary: startup + per tool call.
 
-## Troubleshooting
+## AiConnect adapter (`src/discovery_studio_mcp/aioconnect.py`)
 
-### "Perl executable not found"
-Update `DS_PERL_EXECUTABLE` in `.env` to the correct perl.exe path.
+- **License gate**: `MCP_LICENSE_TOKEN` validated at startup and per tool
+  call (monkey-patches the MCP server's `call_tool` handler to intercept
+  `CallToolRequest` before forwarding). Invalid/expired → structured
+  `fail("LICENSE")` envelope; no tool call is forwarded.
+- **Response envelope**: every forwarded tool result is wrapped in
+  `ok(data)` XOR `fail(code, message)` (tool-response.schema.json).
+- **Env-gated**: `AICONNECT_ENABLE=1` only (set by the Process Manager
+  on managed spawns). Standalone (`python -m discovery_studio_mcp.server`)
+  = pure upstream behaviour.
+- **Zero upstream modifications**: all 12 tools preserved unchanged.
+  The adapter hooks into `server.request_handlers` at runtime.
 
-### "Pipeline Pilot Server not configured"
-Set `DS_PIPELINE_PILOT_URL` for protocol execution, or use mock mode.
+## Security assessment
 
-### "Path not in allowed directories"
-Add the directory to `DS_ALLOWED_INPUT_DIRS` (semicolon-separated on Windows).
+| Tool module | Tools | Classification |
+|---|---|---|
+| Diagnostics | `ds_get_capabilities`, `ds_health_check` | NORMAL — read-only status |
+| Structures | `ds_inspect_structure`, `ds_validate_structure`, `ds_convert_structure` | NORMAL — file parsing, no exec |
+| Protocols | `ds_list_protocols`, `ds_describe_protocol`, `ds_run_protocol` | NORMAL — delegated to Pipeline Pilot |
+| Jobs | `ds_get_job_status`, `ds_cancel_job`, `ds_list_jobs` | NORMAL — job lifecycle |
+| Visualization | `ds_render_structure` | NORMAL — requires GUI session |
 
-### "Discovery Studio not found"
-Set `DS_HOME` to your Discovery Studio installation root.
+- **No arbitrary execution tools** — all 12 tools are domain-specific
+  Discovery Studio operations.
+- The upstream README explicitly documents: "No arbitrary code execution".
+- Security features: path traversal protection, whitelist-based extension
+  validation, output isolation, protocol whitelist, destructive action
+  confirmation.
+- The connector never sends credentials through the AiConnect cloud;
+  all operations are local.
 
-## Removing the Project
+## Tests
 
-```powershell
-pip uninstall discovery-studio-mcp
-Remove-Item -Recurse discovery-studio-mcp
-```
+- Adapter: `python3 tests/check_aioconnect.py` → **9/9** (license gate,
+  per-call recheck, envelope helpers, disabled mode, patch no-op).
+- Round-trip: `python3 tests/roundtrip_proxy.py` → **12/12** (initialize,
+  tools/list, tools/call, license gate, envelope wrap, patch behaviour)
+  against `tests/mock_ds_server.py`, a standalone mock of the DS MCP
+  server — no Discovery Studio needed.
+- **LIVE DS VALIDATION BLOCKED** — no BIOVIA Discovery Studio on this
+  machine (Windows desktop software).
 
-## Health Check
+## Source mapping (upstream → AiConnect)
 
-```powershell
-# Verify environment
-python tools/discover_environment.py
+| Upstream | AiConnect |
+|---|---|
+| `python -m discovery_studio_mcp.server` | `run_server.py` (AiConnect entry, `stdio: true`) |
+| `mcp.server.Server` + `stdio_server` | same — monkey-patched at runtime |
+| 12 tools across 5 categories | unchanged — all tools preserved |
+| 3 adapters (DiscoveryScript, Filesystem, Mock) | unchanged |
+| `DS_MOCK_MODE=true` | same — for development without DS |
 
-# Run tests
-pytest tests/ -v
+## Attribution
 
-# Check MCP server startup
-python -m discovery_studio_mcp.server
-```
-
-## License
-
-MIT. See LICENSE file.
-
-This project is not affiliated with, endorsed by, or sponsored by Dassault Systèmes or BIOVIA.
-Discovery Studio is a registered trademark of Dassault Systèmes.
-
-## Next Steps
-
-For the full roadmap and current status, see:
-- `reports/environment-report.md` - Environment details
-- `reports/automation-capabilities.md` - Capability matrix and test status
-- `docs/adr/architecture-decisions.md` - Architecture decisions
-- `skills/discovery-studio/SKILL.md` - Agent usage guidelines
+- Upstream: `discovery-studio-mcp` — MIT License, Copyright (c) 2026.
+  LICENSE preserved verbatim at `./LICENSE`.
+- BIOVIA Discovery Studio is a proprietary commercial product of Dassault
+  Systèmes; its license is separate from this connector's MIT license.
