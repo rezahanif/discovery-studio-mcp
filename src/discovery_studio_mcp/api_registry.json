@@ -1,0 +1,706 @@
+[
+  {
+    "name": "FIRSTKEY",
+    "package": "DSScript",
+    "function_path": "DSScript::FIRSTKEY",
+    "description": "FirstKey specifies the first key of a map collection",
+    "usage_example": "Using the FirstKey property Get my $attributemapkeyObject = $object-&gt;FirstKey; my $stringValue = $object-&gt;FirstKey; Parameters Name Optional/Required Default value Description $attributemapkeyObject &#160; &#160; Sdm::AttributeMapKey $stringValue &#160; &#160; String $object &#160; &#160; Disc",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\firstkey_property.htm"
+  },
+  {
+    "name": "NEXTKEY",
+    "package": "DSScript",
+    "function_path": "DSScript::NEXTKEY",
+    "description": "NextKey specifies the next key of a map",
+    "usage_example": "Using the NextKey property Get my $attributemapkeyObject = $object-&gt;NextKey( &lt;previouskey&gt; ); my $attributemapkeyObject = $object-&gt;NextKey( { PreviousKey =&gt; &lt;previouskey&gt; } ); my $stringValue = $object-&gt;NextKey( &lt;previouskey&gt; ); my $stringValue = $object-&gt;NextKey( {",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\nextkey_property.htm"
+  },
+  {
+    "name": "CreateGroupComplement",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateGroupComplement",
+    "description": "Creates a new atom group that is complementary to specified groups, i.e",
+    "usage_example": "Using the CreateGroupComplement command my $group = CreateGroupComplement( &lt;document&gt;, &lt;groups&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Opens a protein and creates a group which contains anything that is not protein use",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\creategroupcomplement_command.htm"
+  },
+  {
+    "name": "CreateGroupComplementResidues",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateGroupComplementResidues",
+    "description": "Creates a new group of residues that is complementary to specified groups, i.e",
+    "usage_example": "Using the CreateGroupComplementResidues command my $group = CreateGroupComplementResidues( &lt;document&gt;, &lt;groups&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Creates a complementary residue group to the selected group(s) use",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\creategroupcomplementresidues_command.htm"
+  },
+  {
+    "name": "CreateGroupIntersection",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateGroupIntersection",
+    "description": "Creates a new atom group containing common objects from the specified groups",
+    "usage_example": "Using the CreateGroupIntersection command my $group = CreateGroupIntersection( &lt;document&gt;, &lt;group0&gt;, &lt;group1&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Creates a group intersection use strict; use MdmCommands; my $d",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\creategroupintersection_command.htm"
+  },
+  {
+    "name": "CreateGroupIntersectionResidues",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateGroupIntersectionResidues",
+    "description": "Creates a new residue group from the specified groups which contains common residues",
+    "usage_example": "Using the CreateGroupIntersectionResidues command my $group = CreateGroupIntersectionResidues( &lt;document&gt;, &lt;group0&gt;, &lt;group1&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Creates a group intersection use strict; use Md",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\creategroupintersectionresidues_command.htm"
+  },
+  {
+    "name": "CreateGroupUnion",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateGroupUnion",
+    "description": "Creates a new atom group which forms a union of the specified input",
+    "usage_example": "Using the CreateGroupUnion command my $group = CreateGroupUnion( &lt;document&gt;, &lt;groups&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Create a union group use strict; use MdmCommands; my $document = FileNew(); FileInsert($docum",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\creategroupunion_command.htm"
+  },
+  {
+    "name": "CreateGroupUnionResidues",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateGroupUnionResidues",
+    "description": "Creates a new residue group which forms a union or summation of the 2 specified residue groups",
+    "usage_example": "Using the CreateGroupUnionResidues command my $group = CreateGroupUnionResidues( &lt;document&gt;, &lt;groups&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Creates a residue union use strict; use MdmCommands; my $document = FileNew()",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\creategroupunionresidues_command.htm"
+  },
+  {
+    "name": "RemoveGroups",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::RemoveGroups",
+    "description": "Removes all groups from the document leaving their contents intact",
+    "usage_example": "Using the RemoveGroups command my $counter = RemoveGroups( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples remove all groups use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrlPrefix . '3JZK.pdb'); Cr",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\removegroups_command.htm"
+  },
+  {
+    "name": "FileNew",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::FileNew",
+    "description": "Creates a new MD or SDM document",
+    "usage_example": "Using the FileNew command my $document = FileNew( [docType] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Create new Mdm document use strict; use MdmCommands; my $document = FileNew(); # Insert a pdb file FileInsert($document,PdbUrlPrefix . '4phv",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\filenew_command.htm"
+  },
+  {
+    "name": "FileOpen",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::FileOpen",
+    "description": "Opens a file in a new document",
+    "usage_example": "Using the FileOpen command my $document = FileOpen( &lt;urlString&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Create a new DS document use strict; use MdmCommands; my $document = FileOpen('1kim.pdb'); Further information Scripting Commands",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\fileopen_command.htm"
+  },
+  {
+    "name": "FileInsert",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::FileInsert",
+    "description": "Opens a file and inserts it into the specified document",
+    "usage_example": "Using the FileInsert command my $status = FileInsert( &lt;document&gt;, &lt;string&gt;, [type] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Insert 4phv, a HIV protease complex, into an new document. use strict; use MdmCommands; # create an empty",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\fileinsert_command.htm"
+  },
+  {
+    "name": "ResetDisplay",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ResetDisplay",
+    "description": "Sets display back to the original defaults",
+    "usage_example": "Using the ResetDisplay command my $integer = ResetDisplay( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Reset display settings use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrlPrefix . '3JZK.pdb'",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\resetdisplay_command.htm"
+  },
+  {
+    "name": "SetPublicationQualityDisplay",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SetPublicationQualityDisplay",
+    "description": "Sets display preferences to optimal quality for generating publication quality images, with a white background",
+    "usage_example": "Using the SetPublicationQualityDisplay command my $integer = SetPublicationQualityDisplay( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Set to high quality display use strict; use MdmCommands; my $document = FileNew(); FileInser",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\setpublicationqualitydisplay_command.htm"
+  },
+  {
+    "name": "SetFastPerformanceDisplay",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SetFastPerformanceDisplay",
+    "description": "Sets display preferences to optimize performance",
+    "usage_example": "Using the SetFastPerformanceDisplay command my $integer = SetFastPerformanceDisplay( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Set display to fast performance use strict; use MdmCommands; my $document = FileNew(); FileInsert(",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\setfastperformancedisplay_command.htm"
+  },
+  {
+    "name": "TranslateAll",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::TranslateAll",
+    "description": "Translate moves the view point by the specified distances",
+    "usage_example": "Using the TranslateAll command my $integer = TranslateAll( &lt;document&gt;, &lt;x&gt;, &lt;y&gt;, &lt;z&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples move object by 10.0 A in x direction use strict; use MdmCommands; my $document = FileNew();",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\translateall_command.htm"
+  },
+  {
+    "name": "ZoomSlow",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ZoomSlow",
+    "description": "Zooms out quickly and then slowly zooms in on a structure",
+    "usage_example": "Using the ZoomSlow command my $integer = ZoomSlow( &lt;document&gt;, [zoomin] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Zoom in slowly and zoom out again use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrlPrefix",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\zoomslow_command.htm"
+  },
+  {
+    "name": "ZoomAndRotate",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ZoomAndRotate",
+    "description": "Rotates and zooms in on a molecule (for presentation purposes)",
+    "usage_example": "Using the ZoomAndRotate command my $integer = ZoomAndRotate( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Zoom and rotate a protein with a ligand use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrl",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\zoomandrotate_command.htm"
+  },
+  {
+    "name": "TileMoleculesInView",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::TileMoleculesInView",
+    "description": "Tiles molecules into a grid within the current view",
+    "usage_example": "Using the TileMoleculesInView command my $integer = TileMoleculesInView( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Tile 2 molecules in a document and untile them again. use strict; use MdmCommands; my $document = FileNew(); #",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\tilemoleculesinview_command.htm"
+  },
+  {
+    "name": "UntileMoleculesInView",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::UntileMoleculesInView",
+    "description": "Untiles molecules in view",
+    "usage_example": "Using the UntileMoleculesInView command my $integer = UntileMoleculesInView( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Tile 2 molecules in a document and untile them again use strict; use MdmCommands; my $document = FileNew()",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\untilemoleculesinview_command.htm"
+  },
+  {
+    "name": "Delete",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::Delete",
+    "description": "",
+    "usage_example": "",
+    "doc_file": "share\\doc\\DS\\content\\docds\\client\\faq_general_delete-group.htm"
+  },
+  {
+    "name": "GetLigands",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetLigands",
+    "description": "Create an array containing the ligands within the input container",
+    "usage_example": "Using the GetLigands command my $array = GetLigands( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Retrieve ligands from the document and deletes them use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,Pd",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getligands_command.htm"
+  },
+  {
+    "name": "GetMetalAtoms",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetMetalAtoms",
+    "description": "Creates an array containing any metal atoms in the input",
+    "usage_example": "Using the GetMetalAtoms command my $array = GetMetalAtoms( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Find metals atoms in protein use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrlPrefix . '1r5",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getmetalatoms_command.htm"
+  },
+  {
+    "name": "GetWaters",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetWaters",
+    "description": "Returns an array containing any water residues in the document/molecule specified in the Water group",
+    "usage_example": "Using the GetWaters command my $array = GetWaters( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples retrieve water residues use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrlPrefix . '1r55.pdb'); my $",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getwaters_command.htm"
+  },
+  {
+    "name": "GetWatersByName",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetWatersByName",
+    "description": "Creates an array containing residues named TIP[0-9]* or HOH[0-9]*",
+    "usage_example": "Using the GetWatersByName command my $waters = GetWatersByName( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples retrieve water from document use strict; use MdmCommands; my $waters = GetWatersByName($document); Further information",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getwatersbyname_command.htm"
+  },
+  {
+    "name": "GetProteinChains",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetProteinChains",
+    "description": "Creates an array containing any protein chains in the input",
+    "usage_example": "Using the GetProteinChains command my $array = GetProteinChains( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples retrieves protein chains use strict; use MdmCommands; my $proteinChains = GetProteinChains($document); Further informa",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getproteinchains_command.htm"
+  },
+  {
+    "name": "GetProteinMolecules",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetProteinMolecules",
+    "description": "Create an array of any molecule in the document that contains a protein chain",
+    "usage_example": "Using the GetProteinMolecules command my $proteins = GetProteinMolecules( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples retrieves proteins from the document use strict; use MdmCommands; my $proteins = GetProteinMolecules($documen",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getproteinmolecules_command.htm"
+  },
+  {
+    "name": "IsProteinMolecule",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::IsProteinMolecule",
+    "description": "Tests whether the specified molecule is a receptor, i.e., has at least one protein chain",
+    "usage_example": "Using the IsProteinMolecule command my $isProtein = IsProteinMolecule( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Displays a message if the document is a protein. use strict; use MdmCommands; print \"This is a protein\\n\" if ( I",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\isproteinmolecule_command.htm"
+  },
+  {
+    "name": "IsLigandMolecule",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::IsLigandMolecule",
+    "description": "Tests whether the specified molecule is a ligand(s), i.e., no chains or exactly one chain but not amino acid, nucleic acid or water molecules",
+    "usage_example": "Using the IsLigandMolecule command my $isLigand = IsLigandMolecule( &lt;molecule&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Displays a message if the document contains only ligands. use strict; use MdmCommands; print \"This is a ligand\" if",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\isligandmolecule_command.htm"
+  },
+  {
+    "name": "FilterByString",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::FilterByString",
+    "description": "Creates an array containing a set of objects using a simple string specifying molecule, chain, residue and atom",
+    "usage_example": "Using the FilterByString command my $array = FilterByString( &lt;document&gt;, &lt;input_string&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Retrieves atoms from a document based on various criteria. use strict; use MdmCommands; # Retrieves",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\filterbystring_command.htm"
+  },
+  {
+    "name": "FilterByStringOnSelection",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::FilterByStringOnSelection",
+    "description": "Create an array of the currently selected objects which also match the given string specification",
+    "usage_example": "Using the FilterByStringOnSelection command my $intersectionArray = FilterByStringOnSelection( &lt;document&gt;, &lt;string&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples filter all ligand atoms names with C1 and C3 use strict; use MdmCommands",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\filterbystringonselection_command.htm"
+  },
+  {
+    "name": "SelectByString",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SelectByString",
+    "description": "Selects the objects that match the given string specification",
+    "usage_example": "Using the SelectByString command my $array = SelectByString( &lt;document&gt;, &lt;string&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Selects all C-alpha and C-beta alanine atoms in the document. use strict; use MdmCommands; my $atoms = Sel",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\selectbystring_command.htm"
+  },
+  {
+    "name": "GetResidueName",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetResidueName",
+    "description": "Returns the label (if any) for the specified amino acid",
+    "usage_example": "Using the GetResidueName command my $aminoAcidName = GetResidueName( &lt;aminoAcid&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Show the label of the first residue in the document. use strict; use MdmCommands; print \"First residues label: \"",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getresiduename_command.htm"
+  },
+  {
+    "name": "ShowWaters",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowWaters",
+    "description": "Sets visibility of water molecules, or toggles current visibility",
+    "usage_example": "Using the ShowWaters command my $n_waters = ShowWaters( &lt;document&gt;, [show] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples hide all water molecules use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUrlPrefix . '1r",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showwaters_command.htm"
+  },
+  {
+    "name": "ShowProteins",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowProteins",
+    "description": "Sets visibility of amino-acid chains, or toggles current visibility",
+    "usage_example": "Using the ShowProteins command my $n_chains = ShowProteins( &lt;document&gt;, [show] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples hide every aminoacid chain use strict; use MdmCommands; ShowProteins($document,0); Further information Scripting Co",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showproteins_command.htm"
+  },
+  {
+    "name": "ShowLigands",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowLigands",
+    "description": "Sets the visibility of ligand chains, or toggles current visibility",
+    "usage_example": "Using the ShowLigands command my $n_ligands = ShowLigands( &lt;document&gt;, [show] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples hide ligands use strict; use MdmCommands; ShowLigands($document,0); Further information Scripting Commands BIOVIA Di",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showligands_command.htm"
+  },
+  {
+    "name": "SetChainAtomAppearance",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SetChainAtomAppearance",
+    "description": "Sets the chain atom display style",
+    "usage_example": "Using the SetChainAtomAppearance command my $integer = SetChainAtomAppearance( &lt;chain&gt;, &lt;color&gt;, &lt;style&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Turn all atoms green and change to ball and stick display style. use strict;",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\setchainatomappearance_command.htm"
+  },
+  {
+    "name": "RenderMetals",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::RenderMetals",
+    "description": "Renders metal atoms as red spheres (by default) in a document or molecule",
+    "usage_example": "Using the RenderMetals command my $metals = RenderMetals( &lt;document&gt;, [style] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Render the metals atoms in the document using the default atom CPK style. use strict; use MdmCommands; my $document",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\rendermetals_command.htm"
+  },
+  {
+    "name": "RenderLigands",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::RenderLigands",
+    "description": "Renders ligand molecules as green (by default) sticks",
+    "usage_example": "Using the RenderLigands command my $integer = RenderLigands( &lt;document&gt;, [ligands], [color] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples turns all atoms ligands green use strict; use MdmCommands; RenderLigands($document); Further informati",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\renderligands_command.htm"
+  },
+  {
+    "name": "TurnOffProteinAtoms",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::TurnOffProteinAtoms",
+    "description": "Sets the protein atoms display style to none",
+    "usage_example": "Using the TurnOffProteinAtoms command my $integer = TurnOffProteinAtoms( &lt;document&gt;, [proteinChains] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Hide protein atoms use strict; use MdmCommands; my $document = FileNew(); FileInsert($documen",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\turnoffproteinatoms_command.htm"
+  },
+  {
+    "name": "TurnOnProteinAtoms",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::TurnOnProteinAtoms",
+    "description": "Sets protein atom display type to line (by default)",
+    "usage_example": "Using the TurnOnProteinAtoms command my $integer = TurnOnProteinAtoms( &lt;document&gt;, [proteinChains], [style] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Hide protein atoms use strict; use MdmCommands; my $document = FileNew(); FileInsert($",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\turnonproteinatoms_command.htm"
+  },
+  {
+    "name": "ApplyProteinDisplayStyle",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ApplyProteinDisplayStyle",
+    "description": "Apply specified display style to all protein chains in the document",
+    "usage_example": "Using the ApplyProteinDisplayStyle command my $integer = ApplyProteinDisplayStyle( &lt;document&gt;, [displaystyle] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Set protein display style to a flat ribbon. use strict; use MdmCommands; my $documen",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\applyproteindisplaystyle_command.htm"
+  },
+  {
+    "name": "ShowJustLigandsAndSurroundingAtoms",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowJustLigandsAndSurroundingAtoms",
+    "description": "Set up the display so that receptor atoms within 4 Angstrom of the ligands are visible",
+    "usage_example": "Using the ShowJustLigandsAndSurroundingAtoms command my $integer = ShowJustLigandsAndSurroundingAtoms( &lt;document&gt;, [ligands], [proteinChains] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Shows atoms close to the ligand in the document. use",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showjustligandsandsurroundingatoms_command.htm"
+  },
+  {
+    "name": "ShowProteinChains",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowProteinChains",
+    "description": "Show all protein chains using a yellow ribbon display style",
+    "usage_example": "Using the ShowProteinChains command my $integer = ShowProteinChains( &lt;proteinChains&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Show the protein chains in the document. use strict; use MdmCommands; ShowProteinChains(GetProteinChains($doc",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showproteinchains_command.htm"
+  },
+  {
+    "name": "HighlightChains",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::HighlightChains",
+    "description": "Iterates through all protein chains in the document and makes each one visible for 3 seconds",
+    "usage_example": "Using the HighlightChains command my $integer = HighlightChains( &lt;document&gt;, [proteinChains] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Highlight each protein in the document for 3 seconds. use strict; use MdmCommands; HighlightChains($d",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\highlightchains_command.htm"
+  },
+  {
+    "name": "SimplifyStructureDisplay",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SimplifyStructureDisplay",
+    "description": "Removes all monitors, surfaces and protein schematics",
+    "usage_example": "Using the SimplifyStructureDisplay command my $integer = SimplifyStructureDisplay( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Simplify the appearance of the current document. use strict; use MdmCommands; SimplifyStructureDispl",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\simplifystructuredisplay_command.htm"
+  },
+  {
+    "name": "Get3DWindowExtents",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::Get3DWindowExtents",
+    "description": "Finds the minimum and maximum coordinates of the 3D view",
+    "usage_example": "Using the Get3DWindowExtents command my ( $maxx, $maxy, $maxz, $minx, $miny, $minz ) = Get3DWindowExtents( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Get the minimum and maximum coordinates of the 3D window containing the docu",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\get3dwindowextents_command.htm"
+  },
+  {
+    "name": "GetExtents",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::GetExtents",
+    "description": "Finds the maximum and minimum coordinates of all atoms in document",
+    "usage_example": "Using the GetExtents command my ( $maxx, $maxy, $maxz, $minx, $miny, $minz ) = GetExtents( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Get the minimum and maximum coordinates of the atoms in the document. use strict; use MdmCom",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getextents_command.htm"
+  },
+  {
+    "name": "AnnotateWindow",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::AnnotateWindow",
+    "description": "Creates an annotation in the document",
+    "usage_example": "Using the AnnotateWindow command my $integer = AnnotateWindow( &lt;document&gt;, &lt;text&gt;, [xdef], [ydef] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Add text to a document. use strict; use MdmCommands; my $document = FileNew(); FileInsert(",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\annotatewindow_command.htm"
+  },
+  {
+    "name": "DeleteWindowAnnotations",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::DeleteWindowAnnotations",
+    "description": "Deletes all annotations in the specified documents",
+    "usage_example": "Using the DeleteWindowAnnotations command my $integer = DeleteWindowAnnotations( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples delete annotation in the document use strict; use MdmCommands; DeleteWindowAnnotations($document); Fur",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\deletewindowannotations_command.htm"
+  },
+  {
+    "name": "AddSlicingPlane",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::AddSlicingPlane",
+    "description": "Adds a slicing plane through the specified objects",
+    "usage_example": "Using the AddSlicingPlane command my $slicingPlane = AddSlicingPlane( &lt;document&gt;, &lt;slicingObjects&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Add slicing plane around the ligand. use strict; use MdmCommands; my $document = FileNew(",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\addslicingplane_command.htm"
+  },
+  {
+    "name": "DeleteAllSlicingPlanes",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::DeleteAllSlicingPlanes",
+    "description": "Deletes all slice planes in document",
+    "usage_example": "Using the DeleteAllSlicingPlanes command my $integer = DeleteAllSlicingPlanes( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples delete slicing planes use strict; use MdmCommands; DeleteAllSlicingPlanes($document); Further informatio",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\deleteallslicingplanes_command.htm"
+  },
+  {
+    "name": "AddHydrogens",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::AddHydrogens",
+    "description": "Adds missing hydrogens to selection, if nothing is selected hydrogens are added to all molecules in the document",
+    "usage_example": "Using the AddHydrogens command my $HydrogensAdded = AddHydrogens( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Add ligand hydrogens to a document. use strict; use MdmCommands; my $document = FileNew(); FileInsert($document,PdbUr",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\addhydrogens_command.htm"
+  },
+  {
+    "name": "AddChiralHydrogens",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::AddChiralHydrogens",
+    "description": "Adds missing chiral hydrogens to selection, if nothing is selected chiral hydrogens are added to all molecules in the document",
+    "usage_example": "Using the AddChiralHydrogens command my $chiralHydrogensAdded = AddChiralHydrogens( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Add chiral hydrogens to molecules in a document. use strict; use MdmCommands; my $document = FileNe",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\addchiralhydrogens_command.htm"
+  },
+  {
+    "name": "RemoveHydrogens",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::RemoveHydrogens",
+    "description": "Removes hydrogen atoms from selection, if nothing is selected all hydrogen atoms are removed",
+    "usage_example": "Using the RemoveHydrogens command my $h_removed = RemoveHydrogens( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples remove all hydrogens use strict; use MdmCommands; $document-&gt;DeselectAll() RemoveHydrogens($document); Further in",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\removehydrogens_command.htm"
+  },
+  {
+    "name": "CleanAllMolecules",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CleanAllMolecules",
+    "description": "Cleans the geometry of the selected molecules",
+    "usage_example": "Using the CleanAllMolecules command my $integer = CleanAllMolecules( &lt;document&gt;, [iterations] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Clean the first ligand in a document. use strict; use MdmCommands; my $document = FileNew(); FileIns",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\cleanallmolecules_command.htm"
+  },
+  {
+    "name": "ShowSurfaces",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowSurfaces",
+    "description": "Sets the visibility of molecular surfaces in the document, or toggles current visibility",
+    "usage_example": "Using the ShowSurfaces command my $n_surf = ShowSurfaces( &lt;document&gt;, [show] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples hide all surfaces use strict; use MdmCommands; ShowSurfaces($document,0); Further information Scripting Commands BIOV",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showsurfaces_command.htm"
+  },
+  {
+    "name": "CreateSurfaceOnSelection",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateSurfaceOnSelection",
+    "description": "Creates a surface on all selected objects in document or if no selection, all atoms are considered",
+    "usage_example": "Using the CreateSurfaceOnSelection command my $newsurface = CreateSurfaceOnSelection( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples create surface around the first ligand in the document use strict; use MdmCommands; SetSelection(",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createsurfaceonselection_command.htm"
+  },
+  {
+    "name": "CreateSurfaceAroundChain",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateSurfaceAroundChain",
+    "description": "Creates a surface around all atoms within a distance of specified chain",
+    "usage_example": "Using the CreateSurfaceAroundChain command my $surface = CreateSurfaceAroundChain( &lt;document&gt;, &lt;inputChain&gt;, [distance] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples create surface around a chain and atoms with a distance of 2 A. use",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createsurfacearoundchain_command.htm"
+  },
+  {
+    "name": "DeleteSurfaces",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::DeleteSurfaces",
+    "description": "Deletes all surfaces in document",
+    "usage_example": "Using the DeleteSurfaces command my $n_surfaces = DeleteSurfaces( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples delete surfaces use strict; use MdmCommands; DeleteSurfaces($document); Further information Scripting Commands BIOVIA",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\deletesurfaces_command.htm"
+  },
+  {
+    "name": "ColorSurface",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ColorSurface",
+    "description": "Color a surface with a specified scheme using a Blue-Green-Red spectrum",
+    "usage_example": "Using the ColorSurface command my $integer = ColorSurface( &lt;document&gt;, &lt;colorby&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Color the ligand surface using the charge property. use strict; use MdmCommands; my $document = FileNew();",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\colorsurface_command.htm"
+  },
+  {
+    "name": "ShowSurfaceLegend",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ShowSurfaceLegend",
+    "description": "Toggles legend for first surface in document",
+    "usage_example": "Using the ShowSurfaceLegend command my $integer = ShowSurfaceLegend( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Toggle label visibility use strict; use MdmCommands; ShowSurfaceLegend($document); Further information Scripting C",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\showsurfacelegend_command.htm"
+  },
+  {
+    "name": "SetSurfaceTransparency",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SetSurfaceTransparency",
+    "description": "Changes transparency for first surface in document Using the SetSurfaceTransparency command my $integer = SetSurfaceTransparency( &lt;document&gt;, [TransparencyLevel] ); Parameters Name Optional/Requ",
+    "usage_example": "Using the SetSurfaceTransparency command my $integer = SetSurfaceTransparency( &lt;document&gt;, [TransparencyLevel] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples show label use strict; use MdmCommands; SetSurfaceTransparency($document); Further",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\setsurfacetransparency_command.htm"
+  },
+  {
+    "name": "LabelSurfaces",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::LabelSurfaces",
+    "description": "Changes name of all surfaces",
+    "usage_example": "Using the LabelSurfaces command my $i = LabelSurfaces( &lt;document&gt;, [label] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Change surface names use strict; use MdmCommands; LabelSurfaces($document); Further information Scripting Commands BIOV",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\labelsurfaces_command.htm"
+  },
+  {
+    "name": "CreateLabelObjects",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateLabelObjects",
+    "description": "Creates labels for an object or array of object, any existing labels will be removed",
+    "usage_example": "Using the CreateLabelObjects command my $count = CreateLabelObjects( &lt;document&gt;, &lt;objects&gt;, &lt;labelstring&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Label all ligands in the document. use strict; use MdmCommands; CreateLabelO",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createlabelobjects_command.htm"
+  },
+  {
+    "name": "CreateHBondMonitors",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateHBondMonitors",
+    "description": "Creates hydrogen bond monitors for all atoms in the document",
+    "usage_example": "Using the CreateHBondMonitors command my $monitor = CreateHBondMonitors( &lt;document&gt;, [scope] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples create hydrogen bond monitors in a document use strict; use MdmCommands; my $document = FileNew(); Fi",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createhbondmonitors_command.htm"
+  },
+  {
+    "name": "AlignMolecules",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::AlignMolecules",
+    "description": "Aligns molecules based on tethers (Tuple Monitors)",
+    "usage_example": "Using the AlignMolecules command my $integer = AlignMolecules( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Align 2 molecules use strict; use MdmCommands; my $document = FileNew(); ## create 2 molecules $document-&gt;InsertFromS",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\alignmolecules_command.htm"
+  },
+  {
+    "name": "CreateTethers",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateTethers",
+    "description": "Create tethers (tuple monitors) for selected atoms used by AlignMolecules",
+    "usage_example": "Using the CreateTethers command my $newtuple = CreateTethers( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Align 2 molecules using tethers use strict; use MdmCommands; my $document = FileNew(); ## create 2 molecules $document-&g",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createtethers_command.htm"
+  },
+  {
+    "name": "CheckValency",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CheckValency",
+    "description": "Checks valency violations in the document",
+    "usage_example": "Using the CheckValency command my $violationCount = CheckValency( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Add hydrogens and count valency violations. use strict; use MdmCommands; my $document = FileNew(); $document-&gt;Inse",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\checkvalency_command.htm"
+  },
+  {
+    "name": "CheckChirality",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CheckChirality",
+    "description": "Creates a chirality monitor and removes an existing one",
+    "usage_example": "Using the CheckChirality command my $monitor = CheckChirality( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Count chiral centers in document. use strict; use MdmCommands; my $document = FileNew(); $document-&gt;InsertFromSmiles(",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\checkchirality_command.htm"
+  },
+  {
+    "name": "CreateSlicingSlab",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateSlicingSlab",
+    "description": "Creates a slice slab through specified objects in document",
+    "usage_example": "Using the CreateSlicingSlab command my $integer = CreateSlicingSlab( &lt;document&gt;, &lt;slicingObjects&gt;, [distance] ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples create slicing planes for ligands use strict; use MdmCommands; CreateSlicingSl",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createslicingslab_command.htm"
+  },
+  {
+    "name": "MoveIntoNewMolecule",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::MoveIntoNewMolecule",
+    "description": "Moves the specified molecule(s) into a new Molecule",
+    "usage_example": "Using the MoveIntoNewMolecule command my $newObject = MoveIntoNewMolecule( &lt;document&gt;, &lt;molecule&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Moves ligand from the receptor into a new molecule use strict; use MdmCommands; MoveIntoNe",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\moveintonewmolecule_command.htm"
+  },
+  {
+    "name": "CopyIntoNewMolecule",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CopyIntoNewMolecule",
+    "description": "Creates a new molecule which contains copies of the specified molecule(s)",
+    "usage_example": "Using the CopyIntoNewMolecule command my $copy = CopyIntoNewMolecule( &lt;document&gt;, &lt;molecule&gt;, &lt;treeroot&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Opens a pdb entry copies the ligand into a new molecule and removes the prote",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\copyintonewmolecule_command.htm"
+  },
+  {
+    "name": "SetSelection",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::SetSelection",
+    "description": "Sets the selection of the document to match the specified array of objects",
+    "usage_example": "Using the SetSelection command my $n_selected = SetSelection( &lt;document&gt;, &lt;selection&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Restore selected objects use strict; use MdmCommands; # store current selection my $savedSelection = $",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\setselection_command.htm"
+  },
+  {
+    "name": "CreateArrayFromSelection",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::CreateArrayFromSelection",
+    "description": "Returns an array with selected objects",
+    "usage_example": "Using the CreateArrayFromSelection command my $selected = CreateArrayFromSelection( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Opens a protein selects the ligand and loops over all ligand objects. use strict; use MdmCommands;",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createarrayfromselection_command.htm"
+  },
+  {
+    "name": "RemoveAllMonitors",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::RemoveAllMonitors",
+    "description": "Removes all monitors from the current document",
+    "usage_example": "Using the RemoveAllMonitors command my $numDeleted = RemoveAllMonitors( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Display a message showing the number of monitors deleted from the document. use strict; use MdmCommands; my $nu",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\removeallmonitors_command.htm"
+  },
+  {
+    "name": "ContainsCarbon",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ContainsCarbon",
+    "description": "Checks if object contains a carbon atom",
+    "usage_example": "Using the ContainsCarbon command my $integer = ContainsCarbon( &lt;container&gt; ); Parameters Name Optional/Required Default value Type Description Defined by MdmCommands Examples Determine if the ligand contains a carbon atom. use strict; use MdmCommands; my $document = FileNew(); FileInsert($docu",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\containscarbon_command.htm"
+  },
+  {
+    "name": "ColorByAlphaFoldModelConfidence",
+    "package": "MdmCommands",
+    "function_path": "MdmCommands::ColorByAlphaFoldModelConfidence",
+    "description": "Using the ColorByAlphaFoldModelConfidence command = ColorByAlphaFoldModelConfidence( ); Defined by MdmCommands Examples use strict; use MdmCommands; Further information Scripting Commands BIOVIA Disco",
+    "usage_example": "Using the ColorByAlphaFoldModelConfidence command = ColorByAlphaFoldModelConfidence( ); Defined by MdmCommands Examples use strict; use MdmCommands; Further information Scripting Commands BIOVIA Discovery Studio 2025 Help:&#160; Thursday, October 10, 2024 Legal Notices",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\colorbyalphafoldmodelconfidence_command.htm"
+  },
+  {
+    "name": "LaunchProtocol",
+    "package": "ProtocolCommands",
+    "function_path": "ProtocolCommands::LaunchProtocol",
+    "description": "Launches a protocol by its name",
+    "usage_example": "Using the LaunchProtocol command my $integer = LaunchProtocol( &lt;protocolName&gt;, &lt;parameterMap&gt;, [server], [saveIntermediate], [userRunFolder] ); Parameters Name Optional/Required Default value Type Description Defined by ProtocolCommands Examples Launch the calculate energy protocol using",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\launchprotocol_command.htm"
+  },
+  {
+    "name": "FindBindingSites",
+    "package": "SbdCommands",
+    "function_path": "SbdCommands::FindBindingSites",
+    "description": "Finds binding sites from cavities of all receptor molecules in the document",
+    "usage_example": "Using the FindBindingSites command my $bindingSites = FindBindingSites( &lt;document&gt;, &lt;molecule&gt; ); Parameters Name Optional/Required Default value Type Description Defined by SbdCommands Examples Find the receptor binding sites for a protein. use strict; use SbdCommands; my $document = Md",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\findbindingsites_command.htm"
+  },
+  {
+    "name": "CreateAndPartitionBindingSites",
+    "package": "SbdCommands",
+    "function_path": "SbdCommands::CreateAndPartitionBindingSites",
+    "description": "Finds and partitions receptor binding sites in the document or a molecule",
+    "usage_example": "Using the CreateAndPartitionBindingSites command my $bindingSites = CreateAndPartitionBindingSites( &lt;document&gt;, [molecule] ); Parameters Name Optional/Required Default value Type Description Defined by SbdCommands Examples Opens a protein and finds binding sites. use strict; use SbdCommands; m",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createandpartitionbindingsites_command.htm"
+  },
+  {
+    "name": "FindBindingSitesFromLigands",
+    "package": "SbdCommands",
+    "function_path": "SbdCommands::FindBindingSitesFromLigands",
+    "description": "Finds binding sites from ligand shape",
+    "usage_example": "Using the FindBindingSitesFromLigands command my $bindingSites = FindBindingSitesFromLigands( &lt;document&gt;, &lt;receptor&gt;, &lt;ligand&gt; ); Parameters Name Optional/Required Default value Type Description Defined by SbdCommands Examples use strict; use SbdCommands; use MdmCommands; # use Mdm",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\findbindingsitesfromligands_command.htm"
+  },
+  {
+    "name": "LoopThroughBindingSites",
+    "package": "SbdCommands",
+    "function_path": "SbdCommands::LoopThroughBindingSites",
+    "description": "Finds and displays each binding site in turn",
+    "usage_example": "Using the LoopThroughBindingSites command my $count = LoopThroughBindingSites( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by SbdCommands Examples Finds and loops through the binding sites in the document. use strict; use SbdCommands; my $document = M",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\loopthroughbindingsites_command.htm"
+  },
+  {
+    "name": "CreateHotSpotsLabels",
+    "package": "SbdCommands",
+    "function_path": "SbdCommands::CreateHotSpotsLabels",
+    "description": "Identifies ligand atoms used for hotspot matching by LibDock with a Polar (red) or Apolar (gray) label",
+    "usage_example": "Using the CreateHotSpotsLabels command my $LibDockligands = CreateHotSpotsLabels( &lt;document&gt;, [ligands] ); Parameters Name Optional/Required Default value Type Description Defined by SbdCommands Examples Add Polar and Apolar labels to the LibDock ligand poses. use strict; use SbdCommands; Crea",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createhotspotslabels_command.htm"
+  },
+  {
+    "name": "FIRSTKEY",
+    "package": "ScriptObject",
+    "function_path": "ScriptObject::FIRSTKEY",
+    "description": "FirstKey specifies the first key of a map collection",
+    "usage_example": "Using the FirstKey property Get my $attributemapkeyObject = $object-&gt;FirstKey; my $stringValue = $object-&gt;FirstKey; Parameters Name Optional/Required Default value Description $attributemapkeyObject &#160; &#160; Sdm::AttributeMapKey $stringValue &#160; &#160; String $object &#160; &#160; Disc",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\firstkey_property.htm"
+  },
+  {
+    "name": "NEXTKEY",
+    "package": "ScriptObject",
+    "function_path": "ScriptObject::NEXTKEY",
+    "description": "NextKey specifies the next key of a map",
+    "usage_example": "Using the NextKey property Get my $attributemapkeyObject = $object-&gt;NextKey( &lt;previouskey&gt; ); my $attributemapkeyObject = $object-&gt;NextKey( { PreviousKey =&gt; &lt;previouskey&gt; } ); my $stringValue = $object-&gt;NextKey( &lt;previouskey&gt; ); my $stringValue = $object-&gt;NextKey( {",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\nextkey_property.htm"
+  },
+  {
+    "name": "GetRandomAminoAcidString",
+    "package": "SdmCommands",
+    "function_path": "SdmCommands::GetRandomAminoAcidString",
+    "description": "Returns a random amino acid string of a specified length using one letters code",
+    "usage_example": "Using the GetRandomAminoAcidString command my $string = GetRandomAminoAcidString( [length] ); Parameters Name Optional/Required Default value Type Description Defined by SdmCommands Examples Create a random sequence with 10 amino acids. use strict; use SdmCommands; my $sequence = GetRandomAminoAcidS",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\getrandomaminoacidstring_command.htm"
+  },
+  {
+    "name": "CreateSequenceFromMolecule",
+    "package": "SdmCommands",
+    "function_path": "SdmCommands::CreateSequenceFromMolecule",
+    "description": "Returns the sequence string from the first molecule in the document",
+    "usage_example": "Using the CreateSequenceFromMolecule command my $sequenceString = CreateSequenceFromMolecule( &lt;document&gt; ); Parameters Name Optional/Required Default value Type Description Defined by SdmCommands Examples Get the sequence string from the document. use strict; use SdmCommands; my $sequence = Cr",
+    "doc_file": "share\\doc\\DS\\content\\docds\\scripting\\createsequencefrommolecule_command.htm"
+  }
+]

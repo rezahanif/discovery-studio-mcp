@@ -42,6 +42,7 @@ from discovery_studio_mcp.models import (
     RunProtocolRequest,
 )
 from discovery_studio_mcp.security import is_safe_extension, validate_path
+from discovery_studio_mcp.prompts import register_prompts
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,6 +52,71 @@ logger = logging.getLogger("discovery-studio-mcp")
 
 adapter: DiscoveryStudioAdapter = get_adapter()
 server = Server("discovery-studio-mcp")
+register_prompts(server)
+
+# --- SERVER_INSTRUCTIONS: runtime-rewritable agent guidance ---
+SERVER_INSTRUCTIONS = """Discovery Studio MCP Server — Agent Workflow Guide
+
+WORKFLOW ORDER:
+1. ds_get_capabilities → understand adapter status, license, supported formats
+2. ds_inspect_structure → analyze input file before any operation
+3. ds_validate_structure → check fitness for target workflow
+4. ds_search_api → find the right API method if dedicated tool doesn't exist
+5. ds_run_protocol → execute with validated parameters
+
+TOOL MATCHING:
+- Structure operations → ds_inspect_structure, ds_validate_structure, ds_convert_structure
+- Protocol discovery → ds_list_protocols → ds_describe_protocol → ds_run_protocol
+- Job monitoring → ds_list_jobs → ds_get_job_status → ds_cancel_job
+- API exploration → ds_search_api (keyword) → ds_function_registry (exact name)
+- Rendering → ds_render_structure (requires active GUI session)
+
+SANDBOX CONSTRAINTS:
+- File access limited to configured directories (DS_FILE_WHITELIST)
+- Supported formats: PDB, MOL, MOL2, SDF, XYZ, CIF, PDBQT
+- Pipeline Pilot Server required for protocol execution
+- Mock mode available for testing (DS_MOCK_MODE=true)
+
+FAILURE RECOVERY:
+- Protocol not found → ds_list_protocols to see available options
+- Adapter unavailable → check DS_ROOT, DS_MOCK_MODE, Perl availability
+- License required → check ds_get_capabilities for license status
+- Format unsupported → convert first with ds_convert_structure
+
+UNITS WARNING:
+- Coordinates in Angstroms (default) or user-specified units
+- Energy in kcal/mol (default for most protocols)
+- Distance in Angstroms, angles in degrees
+"""
+
+# --- Layer B: API registry loaded once at startup ---
+_REGISTRY_PATH = Path(__file__).parent / "api_registry.json"
+_API_CATEGORIES_PATH = Path(__file__).parent / "api_categories.json"
+
+def _load_registry() -> list[dict]:
+    try:
+        return json.loads(_REGISTRY_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+
+def _load_categories() -> dict:
+    try:
+        return json.loads(_API_CATEGORIES_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+_API_REGISTRY: list[dict] = _load_registry()
+_API_CATEGORIES: dict = _load_categories()
+
+# Pre-build search index: lowercased name + description tokens per entry
+_SEARCH_INDEX: list[dict] = []
+for _entry in _API_REGISTRY:
+    _tokens = set(_entry["name"].lower().split())
+    _tokens.update(_entry.get("description", "").lower().split())
+    _tokens.update(_entry.get("package", "").lower().split())
+    _indexed = {k: v for k, v in _entry.items()}
+    _indexed["_tokens"] = _tokens
+    _SEARCH_INDEX.append(_indexed)
 
 
 @server.list_tools()
@@ -106,7 +172,8 @@ async def list_tools() -> list[dict[str, Any]]:
                     },
                     "workflow": {
                         "type": "string",
-                        "description": "Target workflow (e.g., 'docking', 'minimization', 'simulation')",
+                        "description": "Target workflow",
+                        "enum": ["docking", "minimization", "simulation", "homology_modeling", "pharmacophore", "qsar", "protein_preparation", "general"],
                     },
                 },
                 "required": ["file_path"],
@@ -237,7 +304,8 @@ async def list_tools() -> list[dict[str, Any]]:
                     },
                     "representation": {
                         "type": "string",
-                        "description": "Representation style (ball_and_stick, cartoon, stick, ribbon, surface)",
+                        "description": "Representation style",
+                        "enum": ["ball_and_stick", "cartoon", "stick", "ribbon", "surface", "wireframe", "sphere"],
                     },
                     "width": {
                         "type": "integer",
@@ -251,11 +319,66 @@ async def list_tools() -> list[dict[str, Any]]:
                     },
                     "output_format": {
                         "type": "string",
-                        "description": "Output image format (png, jpg)",
-                        "default": "png",
+                        "description": "Output image format",
+                        "enum": ["png", "jpg", "tiff", "bmp"],
                     },
                 },
                 "required": ["molecule_path"],
+            },
+        },
+        # --- Layer B: API guidance tools ---
+        {
+            "name": "ds_search_api",
+            "description": "Search the Discovery Studio scripting API by keyword. "
+                           "Returns matching functions with descriptions, usage examples, "
+                           "and package context. Use this when you need to find the right "
+                           "API method for a task but don't know the exact name.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Search query — keywords to match against function names, "
+                                       "descriptions, and packages (e.g. 'create group', 'atom distance', 'pharmacophore')",
+                    },
+                    "package_filter": {
+                        "type": "string",
+                        "description": "Optional: restrict results to a specific package "
+                                       "(e.g. 'MdmCommands', 'SbdCommands')",
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Max results to return (default 10)",
+                        "default": 10,
+                    },
+                },
+                "required": ["query"],
+            },
+        },
+        {
+            "name": "ds_function_registry",
+            "description": "Look up a specific Discovery Studio API function by name. "
+                           "Returns full documentation: description, parameters, usage example, "
+                           "and package. Use this when you know the function name and need details.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "function_name": {
+                        "type": "string",
+                        "description": "Function name to look up (e.g. 'CreateGroup', 'CalculateDistance')",
+                    },
+                },
+                "required": ["function_name"],
+            },
+        },
+        {
+            "name": "ds_list_api_categories",
+            "description": "List all Discovery Studio API categories (packages) and their function counts. "
+                           "Use this to understand the API surface and browse by domain.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
             },
         },
     ]
@@ -375,27 +498,126 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[Any]:
                     "recommendation": "Use Discovery Studio client interactively for rendering.",
                 }]
 
+        # --- Layer B: API guidance tool handlers ---
+        elif name == "ds_search_api":
+            query = arguments.get("query", "").lower().strip()
+            if not query:
+                return [{"error": "query is required"}]
+            query_tokens = set(query.split())
+            pkg_filter = arguments.get("package_filter")
+            limit = arguments.get("limit", 10)
+
+            scored = []
+            for entry in _SEARCH_INDEX:
+                if pkg_filter and entry.get("package") != pkg_filter:
+                    continue
+                overlap = len(query_tokens & entry["_tokens"])
+                if overlap > 0:
+                    scored.append((overlap, entry))
+            scored.sort(key=lambda x: -x[0])
+
+            results = []
+            for _, entry in scored[:limit]:
+                results.append({
+                    "name": entry["name"],
+                    "package": entry.get("package", ""),
+                    "function_path": entry.get("function_path", ""),
+                    "description": entry.get("description", ""),
+                    "usage_example": entry.get("usage_example", ""),
+                    "doc_file": entry.get("doc_file", ""),
+                })
+            return [{
+                "query": arguments["query"],
+                "results": results,
+                "total_matches": len(scored),
+                "returned": len(results),
+            }]
+
+        elif name == "ds_function_registry":
+            func_name = arguments.get("function_name", "").strip()
+            if not func_name:
+                return [{"error": "function_name is required"}]
+            # Exact match first, then partial
+            exact = [e for e in _API_REGISTRY if e["name"].lower() == func_name.lower()]
+            partial = [e for e in _API_REGISTRY if func_name.lower() in e["name"].lower() and e not in exact]
+            matches = exact + partial[:5]
+            if not matches:
+                return [{
+                    "function_name": func_name,
+                    "found": False,
+                    "hint": f"No function matching '{func_name}' in registry. "
+                            f"Try ds_search_api with broader keywords.",
+                }]
+            return [{
+                "function_name": func_name,
+                "found": True,
+                "matches": matches,
+            }]
+
+        elif name == "ds_list_api_categories":
+            cats = []
+            for pkg, info in sorted(_API_CATEGORIES.items()):
+                cats.append({
+                    "package": pkg,
+                    "description": info.get("description", ""),
+                    "function_count": info.get("count", len(info.get("tools", []))),
+                })
+            return [{
+                "categories": cats,
+                "total_packages": len(cats),
+                "total_registry_entries": len(_API_REGISTRY),
+            }]
+
         else:
             return [{"error": f"Unknown tool: {name}"}]
 
     except (SecurityViolationError, ValidationError) as e:
         logger.warning(f"Security violation: {e}")
-        return [{"error": str(e), "type": "security_violation"}]
+        return [{"error": str(e), "type": "security_violation",
+                 "suggested_actions": [
+                     "Check file path is within allowed directories",
+                     "Verify file extension is supported (PDB, MOL, MOL2, SDF, XYZ)",
+                     "Use validate_path() before accessing files",
+                 ]}]
     except ProtocolNotFoundError as e:
         logger.warning(f"Protocol not found: {e}")
-        return [{"error": str(e), "type": "protocol_not_found"}]
+        return [{"error": str(e), "type": "protocol_not_found",
+                 "suggested_actions": [
+                     "Call ds_list_protocols to see available protocols",
+                     "Check protocol name spelling (case-sensitive)",
+                     "Ensure Pipeline Pilot Server is running if protocol requires it",
+                 ]}]
     except LicenseRequiredError as e:
         logger.warning(f"License required: {e}")
-        return [{"error": str(e), "type": "license_required"}]
+        return [{"error": str(e), "type": "license_required",
+                 "suggested_actions": [
+                     "Check Discovery Studio license status via ds_get_capabilities",
+                     "Some protocols require specific license tiers (Enterprise features)",
+                     "Try running with mock mode to test workflow without license",
+                 ]}]
     except AdapterNotAvailableError as e:
         logger.warning(f"Adapter not available: {e}")
-        return [{"error": str(e), "type": "adapter_unavailable"}]
+        return [{"error": str(e), "type": "adapter_unavailable",
+                 "suggested_actions": [
+                     "Check DS_MOCK_MODE environment variable",
+                     "Verify Discovery Studio installation path in DS_ROOT",
+                     "Ensure Perl is available on PATH for DiscoveryScript adapter",
+                 ]}]
     except UnsupportedFormatError as e:
         logger.warning(f"Unsupported format: {e}")
-        return [{"error": str(e), "type": "unsupported_format"}]
+        return [{"error": str(e), "type": "unsupported_format",
+                 "suggested_actions": [
+                     "Supported formats: PDB, MOL, MOL2, SDF, XYZ, CIF, PDBQT",
+                     "Convert to a supported format first using ds_convert_structure",
+                 ]}]
     except DiscoveryStudioError as e:
         logger.error(f"DS error: {e}")
-        return [{"error": str(e), "type": "discovery_studio_error"}]
+        return [{"error": str(e), "type": "discovery_studio_error",
+                 "suggested_actions": [
+                     "Check Discovery Studio logs for detailed error",
+                     "Try ds_health_check to verify component status",
+                     "Retry after ensuring DS is not in a busy state",
+                 ]}]
     except Exception as e:
         logger.exception(f"Unexpected error")
         return [{"error": str(e), "type": "unexpected"}]
@@ -405,6 +627,7 @@ async def main():
     logger.info(f"Starting Discovery Studio MCP Server v{__version__}")
     logger.info(f"Adapter: {type(adapter).__name__}")
     logger.info(f"Mock mode: {settings.ds_mock_mode}")
+    logger.info(f"API registry: {len(_API_REGISTRY)} entries loaded")
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(
