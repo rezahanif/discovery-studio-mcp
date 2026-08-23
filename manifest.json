@@ -9,7 +9,9 @@
   "min_app_version": "0.4.0",
   "platform": {
     "os": "windows",
-    "arch": ["x64"]
+    "arch": [
+      "x64"
+    ]
   },
   "runtime": "python",
   "entry": "run_server.py",
@@ -18,8 +20,17 @@
   "token_env_var": "MCP_LICENSE_TOKEN",
   "entitlement_tier": "pro",
   "platform_requirements": {
-    "python": ["Python >= 3.11"],
-    "host": ["BIOVIA Discovery Studio 2020 (Windows desktop software)"],
-    "optional": ["Pipeline Pilot Server (for protocol execution)"]
+    "python": [
+      "Python >= 3.11"
+    ],
+    "host": [
+      "BIOVIA Discovery Studio 2020 (Windows desktop software)"
+    ],
+    "optional": [
+      "Pipeline Pilot Server (for protocol execution)"
+    ]
+  },
+  "config": {
+    "env": []
   }
 }
