@@ -1,5 +1,4 @@
 """AiConnect adapter unit validation — runs WITHOUT Discovery Studio.
-from pathlib import Path
 
 Validates the adapter layer (startup license gate + per-call license check +
 envelope wrapping) against the real mcp_license_sdk.
@@ -12,10 +11,12 @@ import json
 import os
 import sys
 import time
+from pathlib import Path
 
-os.environ["AICONNECT_SDK_DIR"] = "/project/aiconnector/connectors/sdk/python"
+FORK = Path(__file__).resolve().parents[1]
+os.environ.setdefault("AICONNECT_SDK_DIR", str(FORK.parent / "connector-sdk" / "python"))
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+sys.path.insert(0, str(FORK / "src"))
 
 from discovery_studio_mcp import aioconnect  # noqa: E402
 from mcp_license_sdk import LicenseError  # noqa: E402

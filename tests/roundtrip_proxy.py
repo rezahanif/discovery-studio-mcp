@@ -14,9 +14,11 @@ import os
 import subprocess
 import sys
 import time
+from pathlib import Path
 
-os.environ["AICONNECT_SDK_DIR"] = "/project/aiconnector/connectors/sdk/python"
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+FORK = Path(__file__).resolve().parents[1]
+os.environ.setdefault("AICONNECT_SDK_DIR", str(FORK.parent / "connector-sdk" / "python"))
+sys.path.insert(0, str(FORK / "src"))
 
 
 def mint(entitlements, ttl=600):
