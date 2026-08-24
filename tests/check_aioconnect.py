@@ -1,4 +1,5 @@
 """AiConnect adapter unit validation — runs WITHOUT Discovery Studio.
+from pathlib import Path
 
 Validates the adapter layer (startup license gate + per-call license check +
 envelope wrapping) against the real mcp_license_sdk.
