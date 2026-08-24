@@ -1,5 +1,7 @@
 """Tests for the Discovery Studio MCP server."""
 
+import sys
+
 import pytest
 
 from discovery_studio_mcp.config import Settings
@@ -142,6 +144,9 @@ class TestSecurity:
     def test_sanitize_filename(self):
         assert sanitize_filename("test.pdb") == "test.pdb"
         assert sanitize_filename("../etc/passwd") == "passwd"
+
+    @pytest.mark.skipif(sys.platform != "win32", reason="Windows path handling")
+    def test_sanitize_filename_windows_path(self):
         assert sanitize_filename("C:\\Windows\\system32\\test.pdb") == "test.pdb"
 
     def test_is_safe_extension(self):
