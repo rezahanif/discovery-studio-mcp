@@ -9,9 +9,7 @@
   "min_app_version": "0.4.0",
   "platform": {
     "os": "windows",
-    "arch": [
-      "x64"
-    ]
+    "arch": "x64"
   },
   "runtime": "python",
   "entry": "run_server.py",
@@ -32,5 +30,35 @@
   },
   "config": {
     "env": []
+  },
+  "port_env_var": "MCP_PORT",
+  "package": {
+    "include": [
+      "run_server.py",
+      "src",
+      "src/discovery_studio_mcp/api_registry.json",
+      "src/discovery_studio_mcp/api_categories.json"
+    ],
+    "exclude": []
+  },
+  "tool_tiers": {
+    "core": [
+      "ds_cancel_job",
+      "ds_convert_structure",
+      "ds_describe_protocol",
+      "ds_function_registry",
+      "ds_get_capabilities",
+      "ds_get_job_status",
+      "ds_health_check",
+      "ds_inspect_structure",
+      "ds_list_api_categories",
+      "ds_list_jobs",
+      "ds_list_protocols",
+      "ds_render_structure",
+      "ds_run_protocol",
+      "ds_search_api",
+      "ds_validate_structure"
+    ],
+    "relevance_floor": 3.0
   }
 }

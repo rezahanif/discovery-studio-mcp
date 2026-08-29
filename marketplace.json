@@ -1,0 +1,33 @@
+{
+  "id": "discovery-studio-mcp",
+  "name": "BIOVIA Discovery Studio Molecular Modeling",
+  "category": "Life Sciences & Molecular Modeling",
+  "tags": [
+    "biovia",
+    "discovery-studio",
+    "molecular-modeling",
+    "chemistry",
+    "protein",
+    "computational-biology",
+    "mcp",
+    "life-sciences"
+  ],
+  "author": {
+    "name": "AiConnect Official",
+    "url": "https://aiconnect.fun",
+    "verified": true
+  },
+  "description": "Automate BIOVIA Discovery Studio molecular modeling from AI agents \u2014 inspect and validate molecular structures, convert between formats, run Discovery Studio protocols, manage jobs and render molecular views.",
+  "license": "MIT",
+  "homepage": "https://github.com/rezahanif/discovery-studio-mcp",
+  "assets": {
+    "icon": "assets/logo.svg"
+  },
+  "capabilities": [
+    "Inspect and validate molecular structures",
+    "Convert between molecular file formats",
+    "Execute Discovery Studio protocols",
+    "Submit and manage computational jobs",
+    "Render molecular views and figures"
+  ]
+}

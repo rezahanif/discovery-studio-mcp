@@ -327,7 +327,8 @@ _TOOL_SPECS: list[dict[str, Any]] = [
         "description": "Search the Discovery Studio scripting API by keyword. "
                        "Returns matching functions with descriptions, usage examples, "
                        "and package context. Use this when you need to find the right "
-                       "API method for a task but don't know the exact name.",
+                       "API method for a task but don't know the exact name. "
+                       "Reference documentation only: not executable through this connector.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -354,7 +355,8 @@ _TOOL_SPECS: list[dict[str, Any]] = [
         "name": "ds_function_registry",
         "description": "Look up a specific Discovery Studio API function by name. "
                        "Returns full documentation: description, parameters, usage example, "
-                       "and package. Use this when you know the function name and need details.",
+                       "and package. Use this when you know the function name and need details. "
+                       "Reference documentation only: not executable through this connector.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -369,7 +371,8 @@ _TOOL_SPECS: list[dict[str, Any]] = [
     {
         "name": "ds_list_api_categories",
         "description": "List all Discovery Studio API categories (packages) and their function counts. "
-                       "Use this to understand the API surface and browse by domain.",
+                       "Use this to understand the API surface and browse by domain. "
+                       "Reference documentation only: not executable through this connector.",
         "inputSchema": {
             "type": "object",
             "properties": {},

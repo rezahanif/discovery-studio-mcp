@@ -1,6 +1,20 @@
+[build-system]
+# Declared explicitly. Without a [build-system] pip falls back to setuptools, whose
+# default wheel contents are .py files only — so api_registry.json and
+# api_categories.json were left out of every wheel ever built from this repo, and the
+# three Layer B tools answered from empty state on any pip install (N50).
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# Ships the whole package directory, data files included. Verify with `unzip -l`
+# after changing this: the failure mode is a wheel that builds cleanly and is missing
+# the payload its own tools read.
+packages = ["src/discovery_studio_mcp"]
+
 [project]
 name = "discovery-studio-mcp"
-version = "0.1.0"
+version = "1.0.0"
 description = "MCP server for BIOVIA Discovery Studio automation"
 requires-python = ">=3.11"
 dependencies = [
