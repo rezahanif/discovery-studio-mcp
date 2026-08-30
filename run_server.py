@@ -17,6 +17,15 @@ import sys
 # Add src/ to path so discovery_studio_mcp package is importable
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
 
+# Vendored dependencies (`stage-python-vendor.py`), shipped inside the package.
+# The connector used to ship source-only, so the imports below failed on any machine
+# without the MCP SDK installed system-wide. AI CONNECT bundles the INTERPRETER; the
+# connector brings its own LIBRARIES. Appended, not inserted: a dev virtualenv and the
+# host-injected `mcp_license_sdk` keep priority — `_vendor/` is the floor.
+_vendor = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_vendor")
+if os.path.isdir(_vendor):
+    sys.path.append(_vendor)
+
 from discovery_studio_mcp.aioconnect import ensure_licensed, patch_server_call_tool  # noqa: E402
 from discovery_studio_mcp import server as server_module  # noqa: E402
 

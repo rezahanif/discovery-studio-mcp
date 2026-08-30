@@ -39,7 +39,10 @@
       "src/discovery_studio_mcp/api_registry.json",
       "src/discovery_studio_mcp/api_categories.json"
     ],
-    "exclude": []
+    "exclude": [],
+    "vendor": [
+      "_vendor"
+    ]
   },
   "tool_tiers": {
     "core": [
