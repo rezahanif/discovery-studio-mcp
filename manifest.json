@@ -37,7 +37,8 @@
       "run_server.py",
       "src",
       "src/discovery_studio_mcp/api_registry.json",
-      "src/discovery_studio_mcp/api_categories.json"
+      "src/discovery_studio_mcp/api_categories.json",
+      "src/discovery_studio_mcp/aiconnect_aliases.json"
     ],
     "exclude": [],
     "vendor": [
@@ -62,6 +63,7 @@
       "ds_search_api",
       "ds_validate_structure"
     ],
-    "relevance_floor": 3.0
+    "relevance_floor": 3.0,
+    "aliases_file": "src/discovery_studio_mcp/aiconnect_aliases.json"
   }
 }
