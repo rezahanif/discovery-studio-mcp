@@ -67,6 +67,16 @@ import math
 from discovery_studio_mcp.security import is_safe_extension, validate_path
 
 
+async def _delayed_unlink(path: str, delay: float = 30.0) -> None:
+    """Delay file deletion so asynchronous external GUI processes have time to read it."""
+    try:
+        await asyncio.sleep(delay)
+        if os.path.isfile(path):
+            os.unlink(path)
+    except Exception:
+        pass
+
+
 class DiscoveryScriptAdapter(DiscoveryStudioAdapter):
     """Adapter that uses the bundled Perl interpreter and DiscoveryScript API.
 
@@ -568,8 +578,8 @@ class DiscoveryScriptAdapter(DiscoveryStudioAdapter):
             )
         finally:
             try:
-                os.unlink(script_file)
-            except OSError:
+                asyncio.create_task(_delayed_unlink(script_file, 30.0))
+            except Exception:
                 pass
 
     async def get_active_workspace(self) -> ActiveWorkspaceResult:
@@ -660,8 +670,8 @@ close($fh);
             )
         finally:
             try:
-                os.unlink(script_file)
-            except OSError:
+                asyncio.create_task(_delayed_unlink(script_file, 30.0))
+            except Exception:
                 pass
 
     async def extract_sequence(self, request: ExtractSequenceRequest) -> ExtractSequenceResult:
