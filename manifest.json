@@ -47,10 +47,17 @@
   },
   "tool_tiers": {
     "core": [
+      "ds_align_sequences",
+      "ds_analyze_binding_site",
+      "ds_analyze_interface",
+      "ds_calculate_ramachandran",
       "ds_cancel_job",
       "ds_convert_structure",
       "ds_describe_protocol",
+      "ds_evaluate_mutant",
+      "ds_extract_sequence",
       "ds_function_registry",
+      "ds_get_active_workspace",
       "ds_get_capabilities",
       "ds_get_job_status",
       "ds_health_check",
@@ -58,10 +65,14 @@
       "ds_list_api_categories",
       "ds_list_jobs",
       "ds_list_protocols",
+      "ds_mutate_residue",
+      "ds_prepare_structure",
       "ds_render_structure",
       "ds_run_protocol",
       "ds_search_api",
-      "ds_validate_structure"
+      "ds_superimpose_structures",
+      "ds_validate_structure",
+      "ds_view_in_gui"
     ],
     "relevance_floor": 3.0,
     "aliases_file": "src/discovery_studio_mcp/aiconnect_aliases.json"

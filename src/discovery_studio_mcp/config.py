@@ -1,8 +1,42 @@
 """Configuration management for the Discovery Studio MCP server."""
 
 import os
+import tempfile
 from pathlib import Path
 from pydantic_settings import BaseSettings
+
+
+def _detect_ds_paths() -> tuple[str, str, str, bool]:
+    candidates = [
+        r"C:\Program Files\BIOVIA",
+        r"C:\Program Files\Dassault Systemes",
+        r"C:\Program Files (x86)\BIOVIA",
+        r"C:\Program Files (x86)\Dassault Systemes",
+    ]
+    for base in candidates:
+        if not os.path.isdir(base):
+            continue
+        for name in sorted(os.listdir(base), reverse=True):
+            if "discovery studio" in name.lower():
+                home = os.path.join(base, name)
+                bin_dir = os.path.join(home, "bin")
+                if os.path.isdir(bin_dir):
+                    perl_exe = os.path.join(bin_dir, "perl.exe")
+                    ds_exes = [
+                        f for f in os.listdir(bin_dir)
+                        if f.lower().startswith("discoverystudio") and f.lower().endswith(".exe")
+                    ]
+                    ds_exe = os.path.join(bin_dir, ds_exes[0]) if ds_exes else ""
+                    return home, ds_exe, perl_exe, False
+    return (
+        r"C:\Program Files\BIOVIA\Discovery Studio 2020",
+        r"C:\Program Files\BIOVIA\Discovery Studio 2020\bin\DiscoveryStudio2020.exe",
+        r"C:\Program Files\BIOVIA\Discovery Studio 2020\bin\perl.exe",
+        True,
+    )
+
+
+_default_ds_home, _default_ds_exe, _default_ds_perl, _default_mock = _detect_ds_paths()
 
 
 class Settings(BaseSettings):
@@ -15,9 +49,9 @@ class Settings(BaseSettings):
     }
 
     # Discovery Studio paths
-    ds_home: str = r"C:\Program Files\BIOVIA\Discovery Studio 2020"
-    ds_executable: str = r"C:\Program Files\BIOVIA\Discovery Studio 2020\bin\DiscoveryStudio2020.exe"
-    ds_perl_executable: str = r"C:\Program Files\BIOVIA\Discovery Studio 2020\bin\perl.exe"
+    ds_home: str = _default_ds_home
+    ds_executable: str = _default_ds_exe
+    ds_perl_executable: str = _default_ds_perl
 
     # Pipeline Pilot
     ds_pipeline_pilot_url: str = ""
@@ -33,15 +67,20 @@ class Settings(BaseSettings):
 
     # Features
     ds_enable_ui_fallback: bool = False
-    ds_mock_mode: bool = True
+    ds_mock_mode: bool = _default_mock
 
     @property
     def allowed_input_dirs(self) -> list[Path]:
         dirs = self.ds_allowed_input_dirs
-        if not dirs:
+        res: list[Path] = []
+        if dirs:
+            res = [Path(d.strip()) for d in dirs.split(";") if d.strip()]
+        else:
             home = os.path.expanduser("~")
-            return [Path(home) / "Documents"]
-        return [Path(d.strip()) for d in dirs.split(";") if d.strip()]
+            res = [Path(home), Path(tempfile.gettempdir()), Path.cwd()]
+        if os.path.isdir(self.ds_home):
+            res.append(Path(self.ds_home))
+        return res
 
     @property
     def output_path(self) -> Path:

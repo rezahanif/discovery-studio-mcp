@@ -24,7 +24,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src
 # host-injected `mcp_license_sdk` keep priority — `_vendor/` is the floor.
 _vendor = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_vendor")
 if os.path.isdir(_vendor):
-    sys.path.append(_vendor)
+    import site
+    site.addsitedir(_vendor)
 
 from discovery_studio_mcp.aioconnect import ensure_licensed, patch_server_call_tool  # noqa: E402
 from discovery_studio_mcp import server as server_module  # noqa: E402

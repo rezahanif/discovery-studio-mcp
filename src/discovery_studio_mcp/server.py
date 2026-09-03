@@ -40,6 +40,15 @@ from discovery_studio_mcp.models import (
     ConvertStructureRequest,
     RenderStructureRequest,
     RunProtocolRequest,
+    PrepareStructureRequest,
+    ViewInGuiRequest,
+    ExtractSequenceRequest,
+    MutateResidueRequest,
+    AnalyzeInterfaceRequest,
+    SuperimposeStructuresRequest,
+    AlignSequencesRequest,
+    CalculateRamachandranRequest,
+    EvaluateMutantRequest,
 )
 from discovery_studio_mcp.security import is_safe_extension, validate_path
 from discovery_studio_mcp.prompts import register_prompts
@@ -57,36 +66,28 @@ register_prompts(server)
 # --- SERVER_INSTRUCTIONS: runtime-rewritable agent guidance ---
 SERVER_INSTRUCTIONS = """Discovery Studio MCP Server — Agent Workflow Guide
 
-WORKFLOW ORDER:
-1. ds_get_capabilities → understand adapter status, license, supported formats
-2. ds_inspect_structure → analyze input file before any operation
-3. ds_validate_structure → check fitness for target workflow
-4. ds_search_api → find the right API method if dedicated tool doesn't exist
-5. ds_run_protocol → execute with validated parameters
+BIOLOGICAL 4-STAGE PIPELINE:
+1. ds_inspect_structure   → Stage 1: Fast structural triage (format, chains, residues, ligand, waters, atom counts)
+2. ds_prepare_structure   → Stage 2: Clean protein, protonate at physiological pH (default 7.4), add hydrogens, strip waters
+3. ds_analyze_binding_site → Stage 3: Detect active binding pockets, cavity volume (Angstroms^3), coordinates (X,Y,Z)
+4. ds_view_in_gui         → Stage 4: Live visual dispatch to active Discovery Studio desktop window + frame view + capture PNG
 
-TOOL MATCHING:
-- Structure operations → ds_inspect_structure, ds_validate_structure, ds_convert_structure
-- Protocol discovery → ds_list_protocols → ds_describe_protocol → ds_run_protocol
-- Job monitoring → ds_list_jobs → ds_get_job_status → ds_cancel_job
-- API exploration → ds_search_api (keyword) → ds_function_registry (exact name)
-- Rendering → ds_render_structure (requires active GUI session)
+EXECUTION CONTEXTS (HEADLESS vs. IN-GUI):
+- HEADLESS BATCH: ds_inspect_structure, ds_validate_structure, ds_prepare_structure, ds_analyze_binding_site, ds_convert_structure
+  Operate in background RAM using DiscoveryScript Perl. Do not touch or block the user's desktop application.
+- IN-GUI INTERACTIVE: ds_view_in_gui, ds_get_active_workspace, ds_render_structure
+  Dispatch directly to the running DiscoveryStudio2025.exe session via single-instance Windows IPC. Updates the 3D viewport live and saves preview snapshots.
 
-SANDBOX CONSTRAINTS:
-- File access limited to configured directories (DS_FILE_WHITELIST)
-- Supported formats: PDB, MOL, MOL2, SDF, XYZ, CIF, PDBQT
-- Pipeline Pilot Server required for protocol execution
-- Mock mode available for testing (DS_MOCK_MODE=true)
+ENTERPRISE PROTOCOL TOOLS:
+- ds_run_protocol, ds_get_job_status, ds_cancel_job, ds_list_jobs, ds_describe_protocol
+  Require an active Pipeline Pilot Server URL (DS_PIPELINE_PILOT_URL). If unconfigured, use the local 4-stage pipeline instead.
 
-FAILURE RECOVERY:
-- Protocol not found → ds_list_protocols to see available options
-- Adapter unavailable → check DS_ROOT, DS_MOCK_MODE, Perl availability
-- License required → check ds_get_capabilities for license status
-- Format unsupported → convert first with ds_convert_structure
-
-UNITS WARNING:
-- Coordinates in Angstroms (default) or user-specified units
-- Energy in kcal/mol (default for most protocols)
-- Distance in Angstroms, angles in degrees
+UNITS & CONVENTIONS:
+- Distance & Coordinates: Angstroms (1 A = 0.1 nm = 10^-10 m)
+- Pocket Volume: Cubic Angstroms (A^3)
+- Physiological pH: 7.4 (controls Histidine HSE/HSD/HSP protonation states)
+- Energy: kcal/mol
+- Angles: Degrees
 """
 
 # --- Layer B: API registry loaded once at startup ---
@@ -199,7 +200,9 @@ _TOOL_SPECS: list[dict[str, Any]] = [
     },
     {
         "name": "ds_list_protocols",
-        "description": "List all available Discovery Studio protocols.",
+        "description": "[Requires Pipeline Pilot Enterprise Server] List all available enterprise "
+                       "protocols (e.g. dynamics, docking). For standalone local modeling without server, "
+                       "use ds_prepare_structure, ds_mutate_residue, ds_analyze_binding_site, and ds_analyze_interface.",
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -208,8 +211,8 @@ _TOOL_SPECS: list[dict[str, Any]] = [
     },
     {
         "name": "ds_describe_protocol",
-        "description": "Get detailed information about a protocol: parameters, defaults, "
-                       "required inputs, license requirements, and constraints.",
+        "description": "[Requires Pipeline Pilot Enterprise Server] Get detailed parameter metadata "
+                       "and inputs for a server protocol.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -223,8 +226,10 @@ _TOOL_SPECS: list[dict[str, Any]] = [
     },
     {
         "name": "ds_run_protocol",
-        "description": "Run a Discovery Studio protocol with validated parameters. "
-                       "Requires Pipeline Pilot Server connection.",
+        "description": "[Requires Pipeline Pilot Enterprise Server] Launch a server protocol job. "
+                       "WARNING: Fails if local workstation is not connected to a Pipeline Pilot cluster. "
+                       "For local structural biology tasks, use ds_prepare_structure, ds_mutate_residue, "
+                       "ds_analyze_binding_site, and ds_analyze_interface.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -252,7 +257,7 @@ _TOOL_SPECS: list[dict[str, Any]] = [
     },
     {
         "name": "ds_get_job_status",
-        "description": "Get the current status of a running or completed job.",
+        "description": "[Requires Pipeline Pilot Enterprise Server] Get the current status of a running or completed server job.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -320,6 +325,368 @@ _TOOL_SPECS: list[dict[str, Any]] = [
                 },
             },
             "required": ["molecule_path"],
+        },
+    },
+    {
+        "name": "ds_prepare_structure",
+        "description": "Stage 2: Clean macromolecule and prepare for simulation or docking. "
+                       "Standardizes atom nomenclature, fixes connectivity, adds missing hydrogens "
+                       "at specified pH (default 7.4), and optionally strips crystallographic waters. "
+                       "Operates headlessly and outputs the prepared structure file.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "input_path": {
+                    "type": "string",
+                    "description": "Path to the raw molecular structure file (e.g. .pdb, .mol2)",
+                },
+                "output_path": {
+                    "type": "string",
+                    "description": "Optional destination path for prepared structure. Defaults to prepared_<filename>",
+                },
+                "ph": {
+                    "type": "number",
+                    "description": "Target physiological pH for amino acid protonation states (default: 7.4)",
+                    "default": 7.4,
+                },
+                "keep_waters": {
+                    "type": "boolean",
+                    "description": "If False (default), removes all crystallographic water molecules (HOH). Set True if water bridges are required for ligand binding.",
+                    "default": False,
+                },
+                "standardize_names": {
+                    "type": "boolean",
+                    "description": "Standardize IUPAC nomenclature for terminal groups and isoleucine (default: True)",
+                    "default": True,
+                },
+            },
+            "required": ["input_path"],
+        },
+    },
+    {
+        "name": "ds_analyze_binding_site",
+        "description": "Stage 3: Detect active binding pockets and cavities in a receptor protein. "
+                       "Calculates geometric cavity points, 3D center coordinates (X, Y, Z in Angstroms), "
+                       "and cavity volume in Angstroms^3 (A^3) to verify if drug molecules can fit.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to the prepared receptor structure file",
+                },
+                "grid_resolution": {
+                    "type": "number",
+                    "description": "Grid sampling resolution in Angstroms (default: 0.5 A)",
+                    "default": 0.5,
+                },
+                "site_opening": {
+                    "type": "number",
+                    "description": "Threshold distance for cavity entrance openings in Angstroms (default: 4.0 A)",
+                    "default": 4.0,
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+    {
+        "name": "ds_view_in_gui",
+        "description": "Stage 4 / Live Visualizer: Dispatch structure and visual representation "
+                       "directly into the user's active Discovery Studio 2025 desktop window. "
+                       "Applies 3D display styles (ribbon, ball & stick, CPK spheres), colors by "
+                       "secondary structure or chain, centers camera (FitView), and captures an "
+                       "image snapshot PNG for visual verification.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to structure file to display. If omitted, applies styles to whatever molecule is currently open in the active window.",
+                },
+                "display_style": {
+                    "type": "string",
+                    "description": "3D molecular rendering style",
+                    "enum": ["ribbon_flat", "ribbon_tube", "ball_and_stick", "cpk", "schematic", "stick", "wire"],
+                    "default": "ribbon_flat",
+                },
+                "color_scheme": {
+                    "type": "string",
+                    "description": "Coloring scheme for the protein structure",
+                    "enum": ["secondary", "rainbow", "chain", "molecule", "charge", "hydrophobicity"],
+                    "default": "secondary",
+                },
+                "rotate_x": {
+                    "type": "number",
+                    "description": "Angle in degrees to rotate view around X-axis (pitch)",
+                    "default": 0.0,
+                },
+                "rotate_y": {
+                    "type": "number",
+                    "description": "Angle in degrees to rotate view around Y-axis (yaw)",
+                    "default": 0.0,
+                },
+                "capture_snapshot": {
+                    "type": "boolean",
+                    "description": "Whether to capture a rendered PNG snapshot of the 3D viewport (default: True)",
+                    "default": True,
+                },
+                "snapshot_path": {
+                    "type": "string",
+                    "description": "Optional destination path for the snapshot PNG",
+                },
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "ds_get_active_workspace",
+        "description": "Observability: Inspect the currently open Discovery Studio GUI session. "
+                       "Returns process ID, active molecule document name, total atom count, "
+                       "and count of currently selected objects in the 3D viewport.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    },
+    {
+        "name": "ds_extract_sequence",
+        "description": "Biological Sequence Primitive: Extract amino acid sequence (FASTA format "
+                       "and detailed per-residue breakdown) from a protein structure file. "
+                       "Allows specifying chain_id or extracting all chains.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to input protein structure file (PDB, MOL2, etc.)",
+                },
+                "chain_id": {
+                    "type": "string",
+                    "description": "Optional chain identifier (e.g. 'A') to restrict extraction",
+                },
+                "compact": {
+                    "type": "boolean",
+                    "description": "If true (default), returns clean FASTA sequence and omits lengthy per-residue object arrays to save tokens",
+                    "default": True,
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+    {
+        "name": "ds_mutate_residue",
+        "description": "Computational Mutagenesis Primitive: Introduce an in-silico single amino-acid "
+                       "point mutation into a protein structure. Performs native Discovery Studio side-chain "
+                       "repacking and clean/hydrogen adjustment at pH 7.4, saving the mutant 3D model to disk.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to input structure file",
+                },
+                "residue_id": {
+                    "type": "string",
+                    "description": "Residue sequence number or identifier to mutate (e.g. '57' or '16')",
+                },
+                "target_amino_acid": {
+                    "type": "string",
+                    "description": "Target amino acid 3-letter code or 1-letter symbol (e.g. 'ALA', 'A', 'ARG', 'R')",
+                },
+                "chain_id": {
+                    "type": "string",
+                    "description": "Optional chain identifier (e.g. 'A') where target residue resides",
+                },
+                "repack_and_clean": {
+                    "type": "boolean",
+                    "description": "Whether to perform protonation and side-chain repacking at pH 7.4 (default: True)",
+                    "default": True,
+                },
+                "output_path": {
+                    "type": "string",
+                    "description": "Optional path for the output mutant structure file",
+                },
+            },
+            "required": ["file_path", "residue_id", "target_amino_acid"],
+        },
+    },
+    {
+        "name": "ds_analyze_interface",
+        "description": "Protein-Protein Interface Primitive: Analyze contact residues, hydrogen bonds, "
+                       "and steric clashes between two interacting protein chains (e.g. Chain A and Chain B). "
+                       "Calculates total interface contacts at specified distance threshold in Angstroms.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to protein complex structure file",
+                },
+                "chain_1": {
+                    "type": "string",
+                    "description": "First interacting chain identifier (default: 'A')",
+                    "default": "A",
+                },
+                "chain_2": {
+                    "type": "string",
+                    "description": "Second interacting chain identifier (default: 'B')",
+                    "default": "B",
+                },
+                "contact_cutoff_angstrom": {
+                    "type": "number",
+                    "description": "Distance threshold in Angstroms for defining interface contact (default: 4.5)",
+                    "default": 4.5,
+                },
+                "compact": {
+                    "type": "boolean",
+                    "description": "If true (default), returns interface summary, contacts, clashes, and top 10 H-bonds, omitting massive raw arrays",
+                    "default": True,
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+    {
+        "name": "ds_superimpose_structures",
+        "description": "3D Coordinate Superposition & RMSD Primitive: Superimpose a target protein structure "
+                       "onto a reference protein structure in 3D coordinate space. Computes Root Mean Square "
+                       "Deviation (RMSD) for C-alpha atoms, mainchain backbone atoms, and all atoms in Angstroms. "
+                       "Optionally saves the transformed/aligned target coordinates to a new PDB file.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "reference_path": {
+                    "type": "string",
+                    "description": "Path to reference structure file (e.g. wild-type PDB)",
+                },
+                "target_path": {
+                    "type": "string",
+                    "description": "Path to target structure file to superimpose (e.g. mutant or homolog PDB)",
+                },
+                "align_by": {
+                    "type": "string",
+                    "description": "Atom selection used for superposition alignment",
+                    "enum": ["calpha", "mainchain", "all_atom"],
+                    "default": "calpha",
+                },
+                "output_path": {
+                    "type": "string",
+                    "description": "Optional destination path to save the superimposed target structure file",
+                },
+            },
+            "required": ["reference_path", "target_path"],
+        },
+    },
+    {
+        "name": "ds_align_sequences",
+        "description": "Pairwise Sequence Alignment Primitive: Perform global (Needleman-Wunsch) protein "
+                       "sequence alignment between two amino acid sequences or structures. Calculates percentage "
+                       "sequence identity, percentage sequence similarity, alignment score, matches, mismatches, "
+                       "gaps, and returns a formatted visual alignment with match markers.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "sequence_1": {
+                    "type": "string",
+                    "description": "First amino acid sequence (raw single-letter string or FASTA text)",
+                },
+                "sequence_2": {
+                    "type": "string",
+                    "description": "Second amino acid sequence (raw single-letter string or FASTA text)",
+                },
+                "name_1": {
+                    "type": "string",
+                    "description": "Label for sequence 1 (default: 'Seq1')",
+                    "default": "Seq1",
+                },
+                "name_2": {
+                    "type": "string",
+                    "description": "Label for sequence 2 (default: 'Seq2')",
+                    "default": "Seq2",
+                },
+                "algorithm": {
+                    "type": "string",
+                    "description": "Alignment algorithm",
+                    "enum": ["needleman_wunsch", "smith_waterman"],
+                    "default": "needleman_wunsch",
+                },
+            },
+            "required": ["sequence_1", "sequence_2"],
+        },
+    },
+    {
+        "name": "ds_calculate_ramachandran",
+        "description": "Stereochemical Validation Primitive: Calculate per-residue Phi (φ) and Psi (ψ) "
+                       "backbone dihedral torsion angles from 3D protein coordinates. Classifies every residue "
+                       "into standard Ramachandran regions (Favored, Allowed, Outlier), computing overall percentages "
+                       "and identifying conformational strain outliers.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to protein structure file (PDB format)",
+                },
+                "chain_id": {
+                    "type": "string",
+                    "description": "Optional chain identifier (e.g. 'A') to restrict evaluation",
+                },
+                "generate_plot_image": {
+                    "type": "boolean",
+                    "description": "Whether to generate a 2D scatter plot image of the Ramachandran distribution",
+                    "default": False,
+                },
+                "plot_output_path": {
+                    "type": "string",
+                    "description": "Optional file path for the plot image",
+                },
+                "compact": {
+                    "type": "boolean",
+                    "description": "If true (default), returns stereochemical statistics and outlier list, omitting massive raw 200+ angle tables",
+                    "default": True,
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+    {
+        "name": "ds_evaluate_mutant",
+        "description": "All-in-One Protein Mutagenesis & Evaluation Macro: General-purpose computational pipeline that introduces "
+                       "a single amino-acid point mutation, verifies sequence identity via global pairwise alignment, superimposes "
+                       "3D coordinates, and validates Ramachandran stereochemistry in a single optimized call. Returns a comprehensive "
+                       "evaluation card with RMSD, stereochemical breakdown, and tolerance verdict with ultra-low token overhead (~500 tokens).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to wild-type protein structure file (PDB format)",
+                },
+                "residue_id": {
+                    "type": "string",
+                    "description": "Residue sequence number to mutate (e.g. '16' or '57')",
+                },
+                "target_amino_acid": {
+                    "type": "string",
+                    "description": "Target amino acid 3-letter code or 1-letter symbol (e.g. 'ALA', 'VAL', 'PHE')",
+                },
+                "chain_id": {
+                    "type": "string",
+                    "description": "Optional chain identifier (default: 'A')",
+                    "default": "A",
+                },
+                "repack_and_clean": {
+                    "type": "boolean",
+                    "description": "Whether to perform protonation and side-chain repacking at pH 7.4 (default: True)",
+                    "default": True,
+                },
+                "output_path": {
+                    "type": "string",
+                    "description": "Optional path for the output mutant structure file",
+                },
+            },
+            "required": ["file_path", "residue_id", "target_amino_acid"],
         },
     },
     {
@@ -499,6 +866,119 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[Any]:
                     "available": False,
                     "recommendation": "Use Discovery Studio client interactively for rendering.",
                 }
+
+        elif name == "ds_prepare_structure":
+            prep_req = PrepareStructureRequest(
+                input_path=arguments["input_path"],
+                output_path=arguments.get("output_path"),
+                ph=arguments.get("ph", 7.4),
+                keep_waters=arguments.get("keep_waters", False),
+                standardize_names=arguments.get("standardize_names", True),
+            )
+            prep_res = await adapter.prepare_structure(prep_req)
+            return prep_res.model_dump()
+
+        elif name == "ds_analyze_binding_site":
+            grid_res = arguments.get("grid_resolution", 0.5)
+            site_op = arguments.get("site_opening", 4.0)
+            site_res = await adapter.analyze_binding_site(
+                arguments["file_path"], grid_resolution=grid_res, site_opening=site_op
+            )
+            return site_res.model_dump()
+
+        elif name == "ds_view_in_gui":
+            view_req = ViewInGuiRequest(
+                file_path=arguments.get("file_path"),
+                display_style=arguments.get("display_style", "ribbon_flat"),
+                color_scheme=arguments.get("color_scheme", "secondary"),
+                rotate_x=arguments.get("rotate_x", 0.0),
+                rotate_y=arguments.get("rotate_y", 0.0),
+                capture_snapshot=arguments.get("capture_snapshot", True),
+                snapshot_path=arguments.get("snapshot_path"),
+            )
+            view_res = await adapter.view_in_gui(view_req)
+            return view_res.model_dump()
+
+        elif name == "ds_get_active_workspace":
+            ws_res = await adapter.get_active_workspace()
+            return ws_res.model_dump()
+
+        elif name == "ds_extract_sequence":
+            seq_req = ExtractSequenceRequest(
+                file_path=arguments["file_path"],
+                chain_id=arguments.get("chain_id"),
+                compact=arguments.get("compact", True),
+            )
+            seq_res = await adapter.extract_sequence(seq_req)
+            return seq_res.model_dump()
+
+        elif name == "ds_mutate_residue":
+            mut_req = MutateResidueRequest(
+                file_path=arguments["file_path"],
+                chain_id=arguments.get("chain_id"),
+                residue_id=str(arguments["residue_id"]),
+                target_amino_acid=arguments["target_amino_acid"],
+                repack_and_clean=arguments.get("repack_and_clean", True),
+                output_path=arguments.get("output_path"),
+            )
+            mut_res = await adapter.mutate_residue(mut_req)
+            return mut_res.model_dump()
+
+        elif name == "ds_analyze_interface":
+            iface_req = AnalyzeInterfaceRequest(
+                file_path=arguments["file_path"],
+                chain_1=arguments.get("chain_1", "A"),
+                chain_2=arguments.get("chain_2", "B"),
+                contact_cutoff_angstrom=arguments.get("contact_cutoff_angstrom", 4.5),
+                compact=arguments.get("compact", True),
+            )
+            iface_res = await adapter.analyze_interface(iface_req)
+            return iface_res.model_dump()
+
+        elif name == "ds_superimpose_structures":
+            super_req = SuperimposeStructuresRequest(
+                reference_path=arguments["reference_path"],
+                target_path=arguments["target_path"],
+                align_by=arguments.get("align_by", "calpha"),
+                output_path=arguments.get("output_path"),
+            )
+            super_res = await adapter.superimpose_structures(super_req)
+            return super_res.model_dump()
+
+        elif name == "ds_align_sequences":
+            aln_req = AlignSequencesRequest(
+                sequence_1=arguments["sequence_1"],
+                sequence_2=arguments["sequence_2"],
+                name_1=arguments.get("name_1", "Seq1"),
+                name_2=arguments.get("name_2", "Seq2"),
+                algorithm=arguments.get("algorithm", "needleman_wunsch"),
+            )
+            aln_res = await adapter.align_sequences(aln_req)
+            return aln_res.model_dump()
+
+        elif name == "ds_calculate_ramachandran":
+            rama_req = CalculateRamachandranRequest(
+                file_path=arguments["file_path"],
+                chain_id=arguments.get("chain_id"),
+                generate_plot_image=arguments.get("generate_plot_image", False),
+                plot_output_path=arguments.get("plot_output_path"),
+                compact=arguments.get("compact", True),
+            )
+            rama_res = await adapter.calculate_ramachandran(rama_req)
+            return rama_res.model_dump()
+
+        elif name == "ds_evaluate_mutant":
+            eval_req = EvaluateMutantRequest(
+                file_path=arguments["file_path"],
+                residue_id=str(arguments["residue_id"]),
+                target_amino_acid=arguments["target_amino_acid"],
+                chain_id=arguments.get("chain_id", "A"),
+                repack_and_clean=arguments.get("repack_and_clean", True),
+                output_path=arguments.get("output_path"),
+                compact=arguments.get("compact", True),
+            )
+            eval_res = await adapter.evaluate_mutant(eval_req)
+            return eval_res.model_dump()
 
         # --- Layer B: API guidance tool handlers ---
         elif name == "ds_search_api":

@@ -69,6 +69,63 @@
   "ds_list_api_categories": [
    "browse api packages",
    "api surface by domain"
+  ],
+  "ds_prepare_structure": [
+   "clean protein structure",
+   "add hydrogens and protonate amino acids",
+   "prepare macromolecule for docking",
+   "strip crystallographic water molecules"
+  ],
+  "ds_analyze_binding_site": [
+   "detect protein cavities and binding pockets",
+   "calculate binding site volume in cubic angstroms",
+   "active site cavity coordinates"
+  ],
+  "ds_view_in_gui": [
+   "display molecule in discovery studio window",
+   "show ribbon or ball and stick in active gui",
+   "color protein by secondary structure or chain",
+   "capture 3d viewport snapshot image"
+  ],
+  "ds_get_active_workspace": [
+   "inspect open discovery studio session",
+   "check currently active molecule document",
+   "gui selection and atom count"
+  ],
+  "ds_extract_sequence": [
+   "extract protein sequence fasta from pdb",
+   "read amino acid sequence by chain",
+   "get fasta sequence of protein structure"
+  ],
+  "ds_mutate_residue": [
+   "mutate single amino acid point mutation",
+   "in silico mutagenesis and side chain repacking",
+   "introduce residue substitution in protein model"
+  ],
+  "ds_analyze_interface": [
+   "analyze protein protein interaction interface",
+   "calculate inter chain contact residues and hydrogen bonds",
+   "interface steric clashes between protein chains"
+  ],
+  "ds_superimpose_structures": [
+   "superimpose 3d protein structures",
+   "calculate backbone calpha rmsd displacement",
+   "align molecular coordinates in 3d space"
+  ],
+  "ds_align_sequences": [
+   "pairwise protein sequence alignment",
+   "calculate sequence identity and similarity percentage",
+   "needleman wunsch global alignment"
+  ],
+  "ds_calculate_ramachandran": [
+   "calculate phi psi backbone dihedral angles",
+   "ramachandran plot stereochemical validation",
+   "protein backbone conformational outliers"
+  ],
+  "ds_evaluate_mutant": [
+   "all in one protein mutation evaluation",
+   "in silico mutagenesis screening and validation",
+   "evaluate point mutation rmsd and stereochemistry"
   ]
  }
 }
