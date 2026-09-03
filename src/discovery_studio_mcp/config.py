@@ -1,6 +1,7 @@
 """Configuration management for the Discovery Studio MCP server."""
 
 import os
+import sys
 import tempfile
 from pathlib import Path
 from pydantic_settings import BaseSettings
@@ -78,6 +79,16 @@ class Settings(BaseSettings):
         else:
             home = os.path.expanduser("~")
             res = [Path(home), Path(tempfile.gettempdir()), Path.cwd()]
+            if sys.platform == "win32":
+                try:
+                    import winreg
+                    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders") as key:
+                        dl_path, _ = winreg.QueryValueEx(key, "{374DE290-123F-4565-9164-39C4925E467B}")
+                        exp = os.path.expandvars(dl_path)
+                        if os.path.isdir(exp):
+                            res.append(Path(exp))
+                except Exception:
+                    pass
         if os.path.isdir(self.ds_home):
             res.append(Path(self.ds_home))
         return res
