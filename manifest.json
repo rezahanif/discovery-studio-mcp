@@ -1,7 +1,7 @@
 {
   "id": "discovery-studio-mcp",
   "name": "BIOVIA Discovery Studio Connector",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "BIOVIA Discovery Studio molecular modeling via MCP: structure inspection, validation, conversion, protocol execution, job management, rendering tools through a stdio proxy (MIT, adapted for AiConnect)",
   "publisher": "adapted by AiConnect",
   "manifest_schema_version": 1,
